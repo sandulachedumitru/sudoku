@@ -1,0 +1,17 @@
+Numarul de elemente square pe care le are o linie/coloana dintr-un board.
+Numarul total de elemente square este nrElem^(doi) iar numarul total de cell este nrElem^(patru).
+Deci un board==nrElem^(doi) square==nrElem^(patru) cell.
+3=nrElem (nu poate fi zero)
+Coordonatele valorilor initiale: linia,coloana,valoare
+	[row-column-valoare]		1-4-6			1-7-1	1-8-4	1-9-2
+	2-2-2	2-3-6						
+3-1-7					3-6-4			3-9-9
+					4-6-6	4-7-2		
+	5-2-6		5-4-9		5-6-1		5-8-5	
+		6-3-5	6-4-3					
+7-1-9			7-4-4	textul nu va fi luat in seama	7-9-7
+						8-7-8	8-8-1	
+9-1-8	9-2-4	9-3-2			9-6-7	
+Numerele din coordonate nu pot fi mai mari decat nrElem^(doi) sau mai mici decat valoarea unu.
+Caracterul '^' reprezinta functia exponentiala.
+ACEST FISIER ESTE PERFECT VALABIL

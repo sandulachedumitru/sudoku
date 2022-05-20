@@ -1,0 +1,62 @@
+1	(row=col=1)
+	(endOfSolution=false)
+	(endOfProgram=false)
+	(registerSolution=false)	
+2	WHILE (!endOfProgram)
+		WHILE (!endOfSolution)
+			(flag=true)
+			se obtine celula de coordonate (row,col) //celula(row, col)
+			DACA (celula != originala) atunci
+				DACA (celula.valoare == NULL) atunci initializeaza celula cu valoarea ==1==
+				WHILE (flag && (celula.valoare exista in square/linie/coloana atunci))
+					(celula.valoare++)
+					DACA (verifiesAndCorrectsCell) atunci flag=flase
+			DACA (flag) atunci nextCell
+		WHILE (endOfSolution)
+			DACA (registerSolution) atunci
+				registerSolution=false
+				se adauga solutia in lista de solutii
+			backCell
+			se obtine celula de coordonate (row,col) //celula(row, col)
+			DACA (celula != originala) atunci:
+				(endOfSolution=false)
+				(celula.valoare++)
+				(verifiesAndCorrectsCell)
+
+	private funct verifiesAndCorrectsCell : boolean
+		DACA (celula.valoare > noOfRowsCols^2) atunci
+			(celula.valoare=NULL)
+			(backCell)
+			se obtine celula de coordonate (row,col)
+			(celula.valoare++)
+			return true
+		return false
+	
+	private funct nextCell : void
+		(col++)
+		DACA (col > noOfRowsCols^2) atunci
+			(col=1)
+			(row++)
+			DACA (row > noOfRowsCols^2) atunci
+				(endOfSolution=true)
+				(registerSolution=true)
+		return
+
+	private funct backCell : void
+		(col--)
+		DACA (col < 1) atunci
+			(col=noOfRowsCols^2)
+			(row--)
+			DACA (row < 1) atunci
+				(endOfProgram=true)
+				(endOfSolution=true)
+		return
+		
+		
+		
+		
+		
+		
+		
+		
+		
