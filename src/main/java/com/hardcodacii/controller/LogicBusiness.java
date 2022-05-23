@@ -3,23 +3,27 @@ package com.hardcodacii.controller;
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Cell;
 import com.hardcodacii.model.Solutions;
+import com.hardcodacii.service.DisplayService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
-
-import static com.hardcodacii.view.Show.showDebug;
 
 
 /**
  * Clasa este specializata pe gasirea rezolvarii jocului. Pot exista mai multe variante de rezolvare.
  * @author Sandulache Dumitru
  */
+
+@Controller
+@RequiredArgsConstructor
 public class LogicBusiness {
+    private final DisplayService displayService;
+
     private Board solution = null;
     private Cell cell = null;
     private boolean endOfProgram = false, endOfSolution = false, registerSolution = false, isPresent = false, createSolution = true;
     private Integer row = 1, column = 1;
-    
-    ;
     
     /**
      * Metoda cauta toate rezolvarile 
@@ -34,17 +38,17 @@ public class LogicBusiness {
                 boolean flag = true;
                 cell  = solution.getCellFromCoordinate(row, column);
                 if ( ! cell.getIsOriginal() ) {
-                    showDebug("1CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
+                    displayService.showDebug("1CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                     if (cell.getValue() == null) cell.setValue(1);
                     
                     while (flag && checkCellValueInSquareRowColumn()) {
-                        showDebug("2CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
+                        displayService.showDebug("2CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                         cell.setValue(cell.getValue() + 1);
                         if ( checkMaxLimitOfCellValue() ) flag = false;
                     }
-                    showDebug("3CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
+                    displayService.showDebug("3CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                 }//end if (cell.getIsOriginal())
-                else showDebug("4CELL ORIG:\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
+                else displayService.showDebug("4CELL ORIG:\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                 if ( flag ) nextCell();
             }//end while(! endOfSolution)
             while ( endOfSolution && !endOfProgram) {
@@ -113,7 +117,7 @@ public class LogicBusiness {
         Integer numberOfRowsAndColumns = solution.getNumberOfRowsAndColumns();
         while (cell.getValue() > (numberOfRowsAndColumns*numberOfRowsAndColumns) ) {
             cell.setValue(null);
-            showDebug("5CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
+            displayService.showDebug("5CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
             boolean flagOriginal = true;
             //se verifica ca atunci cand backCell celula sa nu fie originara.
             while ( flagOriginal ) {

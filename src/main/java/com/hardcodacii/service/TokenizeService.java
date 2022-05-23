@@ -1,4 +1,7 @@
-package com.hardcodacii.view;
+package com.hardcodacii.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,13 +11,15 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.hardcodacii.view.Show.showln;
-
 /**
- *
- * @author Sandulache Dumitru
+ * @author Dumitru Săndulache (sandulachedumitru@hotmail.com)
  */
-public class Tokenize {
+
+@Service
+@RequiredArgsConstructor
+public class TokenizeService {
+    private final DisplayService displayService;
+
     /**
      * 
      * @param fileName is a String that represents the data file
@@ -35,7 +40,7 @@ public class Tokenize {
             
             int i = 1;
             for(String word : words) {
-                showln(i++ + ": " + word);
+                displayService.showln(i++ + ": " + word);
             }
             
             isTokenized = true;
@@ -103,9 +108,9 @@ public class Tokenize {
         else {
             int i = 1;
             for(Integer lp : listParsed) {
-                showln(i++ + ": " + lp);
+                displayService.showln(i++ + ": " + lp);
             }
             return listParsed;
         }
     }//end method
-}//end class
+}//end T

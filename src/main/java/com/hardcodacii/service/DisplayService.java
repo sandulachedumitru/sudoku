@@ -1,53 +1,65 @@
-package com.hardcodacii.view;
+package com.hardcodacii.service;
 
 
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Cell;
 import com.hardcodacii.model.Solutions;
 import com.hardcodacii.model.Square;
+import com.hardcodacii.service.FileIOService;
+import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * Clasa e folosita pentru afisarea valorilor.
- * @author Sandulache Dumitru
+ * Show result
+ * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
-public class Show {
-    private static final boolean SHOW = true;
-    private static final boolean SHOW_DEBUG = false;
+
+@Service
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class DisplayService {
+    private boolean SHOW = true;
+    private boolean SHOW_DEBUG = false;
     public static final String delimiter = "------------------------------------------------------------------";
-    private final static WriteToFile writeToFile = new WriteToFile();
+
+    private final FileIOService fileIOService;
     
-    public static void showln(Object obj) {
+    public void showln(Object obj) {
         if (SHOW) {
             System.out.println(obj);
-            writeToFile.writeToFile(obj.toString() + "\r\n");
+            fileIOService.writeToFile(obj.toString() + "\r\n");
         }
     }//end method
     
-    public static void show(Object obj) {
+    public void show(Object obj) {
         if (SHOW) {
             System.out.print(obj);
-            writeToFile.writeToFile(obj.toString());
+            fileIOService.writeToFile(obj.toString());
         }
     }//end method
     
-    public static void showlnErr(Object obj) {
+    public void showlnErr(Object obj) {
         if (SHOW) {
             System.err.println(" -ERROR:" + obj);
-            writeToFile.writeToFile(" -ERROR:" + obj.toString() + "\r\n");
+            fileIOService.writeToFile(" -ERROR:" + obj.toString() + "\r\n");
         }
     }//end method
     
-    public static void showErr(Object obj) {
+    public void showErr(Object obj) {
         if (SHOW) {
             System.err.print(" -ERROR:" + obj);
-            writeToFile.writeToFile(" -ERROR:" + obj.toString());
+            fileIOService.writeToFile(" -ERROR:" + obj.toString());
         }
     }//end method
     
-    public static void showBoard (Board board) {
+    public void showBoard (Board board) {
         int countSquare = 1;
         int countCell = 1;
         showln("\tNUMBER OF ROWS AND COLUMNS: " + board.getNumberOfRowsAndColumns()); showln("");
@@ -116,7 +128,7 @@ public class Show {
         showln("");
     }//end method
     
-    public static void showSolutions (Solutions solutions) {
+    public void showSolutions (Solutions solutions) {
         if ( solutions != null ) {
             Iterator<Board> listOfSolutions = solutions.getListOfSolutions().iterator();
             int countSolutions = 0;
@@ -139,7 +151,7 @@ public class Show {
         }
     }//end method
     
-    public static void showDebug(Object obj) {
+    public void showDebug(Object obj) {
         if (SHOW_DEBUG) showln(obj);
     }
 }//end class
