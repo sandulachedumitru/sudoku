@@ -14,46 +14,46 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Show result
+ * Show logs and results
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
 
 @Service
-@Getter
-@Setter
 @RequiredArgsConstructor
 public class DisplayServiceImpl implements DisplayService {
     private boolean SHOW = true;
     private boolean SHOW_DEBUG = false;
     public static final String delimiter = "------------------------------------------------------------------";
 
-    private final FileIOService fileIOService;
+    private final LogChacheService logChacheService;
     
     public void showln(Object obj) {
         if (SHOW) {
             System.out.println(obj);
-            fileIOService.writeToFile(obj.toString() + "\r\n");
+            logChacheService.showln(obj);
         }
     }//end method
-    
+
     public void show(Object obj) {
         if (SHOW) {
             System.out.print(obj);
-            fileIOService.writeToFile(obj.toString());
+            logChacheService.show(obj);
         }
     }//end method
-    
+
     public void showlnErr(Object obj) {
         if (SHOW) {
-            System.err.println(" -ERROR:" + obj);
-            fileIOService.writeToFile(" -ERROR:" + obj.toString() + "\r\n");
+            String suffix = logChacheService.getErrorSuffix();
+            System.err.println(suffix + obj);
+            logChacheService.showlnErr(obj);
         }
     }//end method
-    
+
     public void showErr(Object obj) {
         if (SHOW) {
-            System.err.print(" -ERROR:" + obj);
-            fileIOService.writeToFile(" -ERROR:" + obj.toString());
+            String suffix = logChacheService.getErrorSuffix();
+            System.err.print(suffix + obj);
+            logChacheService.showErr(obj);
         }
     }//end method
     
@@ -151,5 +151,13 @@ public class DisplayServiceImpl implements DisplayService {
     
     public void showDebug(Object obj) {
         if (SHOW_DEBUG) showln(obj);
+    }
+
+    public void setShow(boolean show) {
+        SHOW = show;
+    }
+
+    public void setShowDebug(boolean showDebug) {
+        SHOW_DEBUG = showDebug;
     }
 }//end class
