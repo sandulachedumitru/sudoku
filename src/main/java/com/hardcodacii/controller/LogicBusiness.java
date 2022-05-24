@@ -3,22 +3,22 @@ package com.hardcodacii.controller;
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Cell;
 import com.hardcodacii.model.Solutions;
-import com.hardcodacii.service.DisplayService;
+import com.hardcodacii.service.DisplayServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 
 /**
- * Clasa este specializata pe gasirea rezolvarii jocului. Pot exista mai multe variante de rezolvare.
- * @author Sandulache Dumitru
+ * The class specializes in finding the solutions of the game. There may be several solutions for solving the game.
+ * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
 
-@Controller
+@Component
 @RequiredArgsConstructor
 public class LogicBusiness {
-    private final DisplayService displayService;
+    private final DisplayServiceImpl displayService;
 
     private Board solution = null;
     private Cell cell = null;

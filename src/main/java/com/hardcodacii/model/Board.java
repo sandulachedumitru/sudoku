@@ -3,13 +3,14 @@ package com.hardcodacii.model;
 import java.util.*;
 
 /**
- * @author Sandulache Dumitru
+ * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
+
 public class  Board {
 
     private enum CoordinateType {
-        //e importanta ordinea in care sunt scrise enumerarile
-        ROW, COLUMN, VALUE;
+        // the order in which the enumerations are written is important
+        ROW, COLUMN, VALUE
     }
     
     private int numberOfRowsAndColumns = 0;
@@ -33,15 +34,13 @@ public class  Board {
         return arrayListOfCell;
     }
     
+    // used internally
+    private Board() {}
+
     /**
-     * Constructor folosit intern.
-     */
-    private Board() {};
-    
-    /**
-     * Constructor in care se initializeaza grila de joc.
-     * @param listFileParsed lista cu valorile luate din fisierul de intrare. Prima valoare din lista e numarul de linii si coloane a patratelor (square) de forma 2x2, 3x3, 4x4.
-     * In cazul in care ptr ex 3x3 atunci pentru celule numarul linii=coloane=3^2=9
+     * Constructor in which the game grid is initialized.
+     * @param listFileParsed list of values taken from the input file. The first value in the list is the number of rows and columns of squares (format: 2x2, 3x3, 4x4, etc).
+     * For a square N x N then the number of cells = N ^ 2, rows = columns = N (ex: 3x3 => 3 ^ 2 = 9)
      */
     public Board(List<Integer> listFileParsed) {
         boolean isFirst = true, makeCell = true; boolean pass = false;
@@ -111,8 +110,8 @@ public class  Board {
                             soc.remove(localCell);
                         }
                     }
-                    Integer rowOfSquare = ((cell.getRow() % numberOfRowsAndColumns) == 0) ? (int) (cell.getRow() / numberOfRowsAndColumns) : (int) (cell.getRow() / numberOfRowsAndColumns) + 1;
-                    Integer columnOfSquare = ((cell.getColumn() % numberOfRowsAndColumns) == 0) ? (int) (cell.getColumn() / numberOfRowsAndColumns) : (int) (cell.getColumn() / numberOfRowsAndColumns) + 1;
+                    Integer rowOfSquare = ((cell.getRow() % numberOfRowsAndColumns) == 0) ? (cell.getRow() / numberOfRowsAndColumns) : (cell.getRow() / numberOfRowsAndColumns) + 1;
+                    Integer columnOfSquare = ((cell.getColumn() % numberOfRowsAndColumns) == 0) ? (cell.getColumn() / numberOfRowsAndColumns) : (cell.getColumn() / numberOfRowsAndColumns) + 1;
                     square = new Square(rowOfSquare, columnOfSquare);
                     
                     if (setOfSquare != null) {

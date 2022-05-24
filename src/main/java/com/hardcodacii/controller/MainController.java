@@ -2,34 +2,31 @@ package com.hardcodacii.controller;
 
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Solutions;
-import com.hardcodacii.service.DisplayService;
-import com.hardcodacii.service.FileIOService;
+import com.hardcodacii.service.DisplayServiceImpl;
+import com.hardcodacii.service.FileIOServiceImpl;
 import com.hardcodacii.service.TokenizeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import static com.hardcodacii.service.DisplayService.delimiter;
+import static com.hardcodacii.service.DisplayServiceImpl.delimiter;
 
 /**
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
 
-@Component
+@Controller
 @RequiredArgsConstructor
-public class Main {
-    private final DisplayService displayService;
-    private final FileIOService fileIOService;
+public class MainController {
+    private final DisplayServiceImpl displayService;
+    private final FileIOServiceImpl fileIOService;
     private final TokenizeService tokenizeService;
     private final LogicBusiness logicBusiness;
 
-
-    public void main(String[] args) {
-        //se verifica daca user introduce mai mult de un path
+    public void start(String[] args) {
+        // checks if the user enters more than one path
         displayService.showln(delimiter); displayService.showln("USER ARGS CHECK...");
         if (args.length != 1) {
             displayService.showlnErr("Must introduce only the name of data file. Format: <file name path>");
@@ -38,7 +35,7 @@ public class Main {
         }
         displayService.showln("OK. USER DATA FILE ARGUMENT PASS."); displayService.showln(delimiter);
 
-        //se verifica daca fisierul intrudus ezista
+        // checks if the inserted file exists
         displayService.showln("VERIFYING THE EXISTANCE OF THE DATA FILE...");
         if (fileIOService.exists(args[0])) {
             displayService.showln("EXISTANCE OF THE DATA FILE IS CONFIRMED."); displayService.showln(delimiter);
@@ -49,7 +46,6 @@ public class Main {
             try {
                 listOfWords = tokenizeService.tokenize(args[0]);
             } catch (FileNotFoundException fnfe) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, fnfe);
                 displayService.showlnErr(fnfe);
                 displayService.showln("SCAN UNSUCCESSFUL. SYSTEM WILL EXIT."); displayService.showln(delimiter);
                 System.exit(-1);

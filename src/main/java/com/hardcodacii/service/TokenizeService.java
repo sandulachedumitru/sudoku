@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class TokenizeService {
-    private final DisplayService displayService;
+    private final DisplayServiceImpl displayService;
 
     /**
      * 

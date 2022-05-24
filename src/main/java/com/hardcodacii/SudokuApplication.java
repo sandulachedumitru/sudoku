@@ -1,6 +1,6 @@
 package com.hardcodacii;
 
-import com.hardcodacii.controller.Main;
+import com.hardcodacii.controller.MainController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @RequiredArgsConstructor
 public class SudokuApplication implements CommandLineRunner {
-	private final Main main;
+	private final MainController mainController;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SudokuApplication.class, args);
@@ -17,6 +17,6 @@ public class SudokuApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		main.main(args);
+		mainController.start(args);
 	}
 }
