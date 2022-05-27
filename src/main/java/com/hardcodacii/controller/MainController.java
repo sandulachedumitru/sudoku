@@ -2,7 +2,7 @@ package com.hardcodacii.controller;
 
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Solutions;
-import com.hardcodacii.service.DisplayServiceImpl;
+import com.hardcodacii.service.DisplayService;
 import com.hardcodacii.service.FileIOServiceImpl;
 import com.hardcodacii.service.TokenizeService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static com.hardcodacii.service.DisplayServiceImpl.delimiter;
+import static com.hardcodacii.service.DisplayService.delimiter;
 
 /**
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
@@ -20,10 +20,10 @@ import static com.hardcodacii.service.DisplayServiceImpl.delimiter;
 @Controller
 @RequiredArgsConstructor
 public class MainController {
-    private final DisplayServiceImpl displayService;
+    private final DisplayService displayService;
     private final FileIOServiceImpl fileIOService;
     private final TokenizeService tokenizeService;
-    private final LogicBusiness logicBusiness;
+    private final GaneSolver logicBusiness;
 
     public void start(String[] args) {
         // checks if the user enters more than one path

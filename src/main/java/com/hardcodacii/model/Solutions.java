@@ -1,27 +1,16 @@
 package com.hardcodacii.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
- * @author Sandulache Dumitru
+ * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
+
+@Getter
+@Setter
 public class Solutions {
     private List<Board> listOfSolutions;
-
-    
-//    private Solutions() { };
-//    private static class SolutionsHolder {
-//        private static Solutions solutions = new Solutions();
-//    }
-//    public Solutions getInstance() {
-//        return SolutionsHolder.solutions;
-//    }
-//    
-    
-    public List<Board> getListOfSolutions() {
-        return listOfSolutions;
-    }
-    public void setListOfSolutions(List<Board> listOfSolutions) {
-        this.listOfSolutions = listOfSolutions;
-    }
 }

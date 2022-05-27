@@ -18,13 +18,12 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class TokenizeService {
-    private final DisplayServiceImpl displayService;
+    private final DisplayService displayService;
 
     /**
      * 
      * @param fileName is a String that represents the data file
      * @return list of scanned words/numbers
-     * @throws java.io.FileNotFoundException
      */
     public List<String> tokenize(String fileName) throws FileNotFoundException {
         boolean isTokenized = false;

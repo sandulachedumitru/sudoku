@@ -1,11 +1,14 @@
 package com.hardcodacii.model;
 
+import lombok.Getter;
+
 import java.util.*;
 
 /**
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
  */
 
+@Getter
 public class  Board {
 
     private enum CoordinateType {
@@ -18,22 +21,6 @@ public class  Board {
     private Set<Square> setOfSquare = null;
     private List<List<Cell>> arrayListOfCell = null;
 
-    public int getNumberOfRowsAndColumns() {
-        return numberOfRowsAndColumns;
-    }
-    
-    public Set<Cell> getSetOfCell() {
-        return setOfCell;
-    }
-    
-    public Set<Square> getSetOfSquare() {
-        return setOfSquare;
-    }
-
-    public List<List<Cell>> getArrayListOfCell() {
-        return arrayListOfCell;
-    }
-    
     // used internally
     private Board() {}
 
@@ -43,10 +30,19 @@ public class  Board {
      * For a square N x N then the number of cells = N ^ 2, rows = columns = N (ex: 3x3 => 3 ^ 2 = 9)
      */
     public Board(List<Integer> listFileParsed) {
-        boolean isFirst = true, makeCell = true; boolean pass = false;
+        // the first positive integer from the input file which specifies the number of rows and columns from a square
+        boolean isFirst = true;
+        // specify that a cell that has value could be built. A valid cell has coordinates and value (row, column, value)
+        boolean makeCell = true;
+        // specify that a cell has all three values (row, column, value) and can be built
+        boolean pass = false;
+        // count is a number from 1 to 3 that specifies for a cell whether a number is
+        // either for a row, for a column, or for a cell value (0 for row, 1 for column, 2 for value)
         int count = 1;
+
         Cell cell = null; Square square;
-        
+
+        // create the set of all cells defined in the input file
         for (Integer listInt : listFileParsed) {
             if (makeCell) {
                 cell = new Cell();
@@ -73,7 +69,7 @@ public class  Board {
                     count++;
                 } //end if
                 if (pass) {
-                    cell.setIsOriginal(true);
+                    cell.setOriginal(true);
                     
                     count = 1;
                     makeCell = true; pass = false;
@@ -84,19 +80,21 @@ public class  Board {
             }//end else
         }//end for
         
-        //se creaza arrayListOfCell
+        // create and init the actual board (arrayListOfCell)
         if (setOfCell != null) {
-            //copiaza setOfCell in soc
+            //copy setOfCell into soc
             Iterator<Cell> iteratorCell = setOfCell.iterator();
             Set<Cell> soc = new HashSet<>();
             while (iteratorCell.hasNext()) soc.add(iteratorCell.next());
 
+            // init the board
+            int boardDimension = numberOfRowsAndColumns*numberOfRowsAndColumns;
             arrayListOfCell = new ArrayList<>();
             List<Cell> listOfCell;
-            for (int row = 1; row <= (numberOfRowsAndColumns*numberOfRowsAndColumns); row++) {
+            for (int row = 1; row <= (boardDimension); row++) {
                 listOfCell = new ArrayList<>();
                 arrayListOfCell.add(listOfCell);
-                for (int column = 1; column <= (numberOfRowsAndColumns*numberOfRowsAndColumns); column++) {
+                for (int column = 1; column <= (boardDimension); column++) {
                     cell = new Cell(row , column);
 
                     boolean flagCell = true;
@@ -204,7 +202,7 @@ public class  Board {
                     cellClone.setRow(cell.getRow());
                     cellClone.setColumn(cell.getColumn());
                     cellClone.setValue(cell.getValue());
-                    cellClone.setIsOriginal(cell.getIsOriginal());
+                    cellClone.setOriginal(cell.isOriginal());
                     copyListOfCells.add(cellClone);
                 }
                 copyArrayListOfCell.add(copyListOfCells);

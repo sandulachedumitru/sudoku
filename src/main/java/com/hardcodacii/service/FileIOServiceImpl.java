@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
-public class FileIOServiceImpl implements FileIOService {
+public class FileIOServiceImpl {
     private static final String dstFile = "SudokuResults.txt";
     private static BufferedWriter outputFile;
 

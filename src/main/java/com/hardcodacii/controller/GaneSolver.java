@@ -3,7 +3,7 @@ package com.hardcodacii.controller;
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Cell;
 import com.hardcodacii.model.Solutions;
-import com.hardcodacii.service.DisplayServiceImpl;
+import com.hardcodacii.service.DisplayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +17,8 @@ import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
-public class LogicBusiness {
-    private final DisplayServiceImpl displayService;
+public class GaneSolver {
+    private final DisplayService displayService;
 
     private Board solution = null;
     private Cell cell = null;
@@ -37,7 +37,7 @@ public class LogicBusiness {
             while(! endOfSolution) {
                 boolean flag = true;
                 cell  = solution.getCellFromCoordinate(row, column);
-                if ( ! cell.getIsOriginal() ) {
+                if ( ! cell.isOriginal() ) {
                     displayService.showDebug("1CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                     if (cell.getValue() == null) cell.setValue(1);
                     
@@ -47,7 +47,7 @@ public class LogicBusiness {
                         if ( checkMaxLimitOfCellValue() ) flag = false;
                     }
                     displayService.showDebug("3CELL:\t\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
-                }//end if (cell.getIsOriginal())
+                }//end if (cell.isOriginal())
                 else displayService.showDebug("4CELL ORIG:\trow:" + cell.getRow() + "\tcolumn:" + cell.getColumn() + "\tvalue:" + cell.getValue());
                 if ( flag ) nextCell();
             }//end while(! endOfSolution)
@@ -66,7 +66,7 @@ public class LogicBusiness {
                 backCell();
                 cell = solution.getCellFromCoordinate(row, column);
                 if ( cell != null ) {
-                    if ( ! cell.getIsOriginal() ) {
+                    if ( ! cell.isOriginal() ) {
                         endOfSolution = false;
                         cell.setValue(cell.getValue() + 1);
                         checkMaxLimitOfCellValue();
@@ -129,7 +129,7 @@ public class LogicBusiness {
                     cell = solution.getCellFromCoordinate(row, column);
                     return true;
                 }
-                if ( ! cell.getIsOriginal() ) flagOriginal = false;
+                if ( ! cell.isOriginal() ) flagOriginal = false;
             }
             cell.setValue(cell.getValue() + 1);
             if ( cell.getValue() <= (numberOfRowsAndColumns*numberOfRowsAndColumns) ) return true;
