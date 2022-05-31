@@ -3,7 +3,7 @@ package com.hardcodacii.controller;
 import com.hardcodacii.model.Board;
 import com.hardcodacii.model.Solutions;
 import com.hardcodacii.service.DisplayService;
-import com.hardcodacii.service.FileIOServiceImpl;
+import com.hardcodacii.service.FileIOService;
 import com.hardcodacii.service.TokenizeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,73 +20,88 @@ import static com.hardcodacii.service.DisplayService.delimiter;
 @Controller
 @RequiredArgsConstructor
 public class MainController {
+    private final static String DEFAULT_FILENAME = "sudoku.txt";
+
     private final DisplayService displayService;
-    private final FileIOServiceImpl fileIOService;
+    private final FileIOService fileIOService;
     private final TokenizeService tokenizeService;
-    private final GaneSolver logicBusiness;
+    private final GaneSolver ganeSolver;
 
     public void start(String[] args) {
-        // checks if the user enters more than one path
-        displayService.showln(delimiter); displayService.showln("USER ARGS CHECK...");
-        if (args.length != 1) {
-            displayService.showlnErr("Must introduce only the name of data file. Format: <file name path>");
-            //System.err.println("Must introduce only the name of data file. Format: <file name path>");
-            System.exit(-1);
+        // checks if the user enters filename parameter; more than 1 parameter will be ignored
+        displayService.showln(delimiter);
+        displayService.showln("USER ARGS CHECK...");
+        String fileName;
+        if (args.length == 0) {
+            fileName = DEFAULT_FILENAME;
+            displayService.showln("OK. USER DATA FILE ARGUMENT NOT FOUND. DEFAULT FILE [" + DEFAULT_FILENAME + "] WILL BE SELECTED.");
+        } else {
+            fileName = args[0];
+            displayService.showln("OK. USER DATA FILE ARGUMENT FOUND.");
         }
-        displayService.showln("OK. USER DATA FILE ARGUMENT PASS."); displayService.showln(delimiter);
+        displayService.showln(delimiter);
 
-        // checks if the inserted file exists
-        displayService.showln("VERIFYING THE EXISTANCE OF THE DATA FILE...");
-        if (fileIOService.exists(args[0])) {
-            displayService.showln("EXISTANCE OF THE DATA FILE IS CONFIRMED."); displayService.showln(delimiter);
-            
-            //se scaneaza fisierul de caractere care nu sunt litere sau cifre. Acestea sunt inlaturate.
-            displayService.showln("SCAN THE FILE...");
-            List<String> listOfWords = null;
-            try {
-                listOfWords = tokenizeService.tokenize(args[0]);
-            } catch (FileNotFoundException fnfe) {
-                displayService.showlnErr(fnfe);
-                displayService.showln("SCAN UNSUCCESSFUL. SYSTEM WILL EXIT."); displayService.showln(delimiter);
-                System.exit(-1);
-            }
-            displayService.showln("SCAN SUCCESSFUL."); displayService.showln(delimiter);
-            
-            //Se analizeaza lista de string-uri serultate
-            displayService.showln("ANALIZE THE LIST OF TOKENS...");
-            List<Integer> listParsed = null;
-            if (listOfWords != null) {
-                try {
-                    listParsed = tokenizeService.analizeTokenizedList(listOfWords);
-                } catch (IllegalArgumentException iae) {
-                    displayService.showlnErr(iae);
-                    displayService.showln("ANALIZE UNSUCCESSFUL. SYSTEM WILL EXIT."); displayService.showln(delimiter);
-                    System.exit(-1);
-                }
-                //Eliberarea memoriei prin decuplarea variabilelor de structurile de date
-                listOfWords = null;
+        // checks if the input file exists
+        displayService.showln("VERIFYING THE EXISTENCE OF THE INPUT DATA FILE...");
+        if (!fileIOService.fileExists(fileName)) {
+            displayService.showln("INPUT DATA FILE NOT FOUND. EXITING APP...");
+            displayService.showln(delimiter);
+            return;
+        }
+        displayService.showln("EXISTENCE OF THE INPUT DATA FILE IS CONFIRMED.");
+        displayService.showln(delimiter);
 
-                displayService.showln("ANALIZE SUCCESSFUL."); displayService.showln(delimiter);
-            }
-            
-            //Se initializeaza datele din model
-            displayService.showln("INITIALIZES BOARD...");
-            Board board = new Board(listParsed);
-            if ((board.getSetOfCell() == null) || (board.getSetOfSquare() == null)) {
-                displayService.showlnErr("board.getSetOfCell(): " + board.getSetOfCell() + " and board.getSetOfSquare():" + board.getSetOfSquare());
-                displayService.showln("INITIALIZATION UNSUCCESSFUL."); displayService.showln(delimiter);
-                System.exit(-1);
-            }
-            listParsed = null; //elibereaza memoria
-            displayService.showBoard(board);
-            displayService.showln("INITIALIZATION SUCCESSFUL."); displayService.showln(delimiter);
-            
-            //Rezolvarea
-            displayService.showln("SEARCHING FOR SOLUTIONS...");
-            Solutions solutions = logicBusiness.findSolution(board);
-            displayService.showSolutions(solutions);
-            displayService.showln("SOLUTIONS FOUND SUCCESSFUL."); displayService.showln(delimiter);
-            
-        }//end if
+        // the file is being scanned; characters that are not letters or numbers are ignored
+        displayService.showln("SCAN THE FILE...");
+        List<String> listOfWords;
+        try {
+            listOfWords = tokenizeService.tokenize(fileName);
+        } catch (FileNotFoundException fnfe) {
+            displayService.showlnErr(fnfe);
+            displayService.showln("SCAN UNSUCCESSFUL. EXITING APP...");
+            displayService.showln(delimiter);
+            return;
+        }
+        displayService.showln("SCAN SUCCESSFUL.");
+        displayService.showln(delimiter);
+
+        // analyze the resulting tokens string list
+        displayService.showln("ANALIZE THE LIST OF TOKENS...");
+        if (listOfWords == null) {
+            displayService.showln("CONTENT OF THE INPUT DATA FILE IS NOT VALID. EXITING APP...");
+            displayService.showln(delimiter);
+            return;
+        }
+        List<Integer> listParsed;
+        try {
+            listParsed = tokenizeService.analizeTokenizedList(listOfWords);
+        } catch (IllegalArgumentException iae) {
+            displayService.showlnErr(iae);
+            displayService.showln("ANALIZE UNSUCCESSFUL. SYSTEM WILL EXIT.");
+            displayService.showln(delimiter);
+            return;
+        }
+        displayService.showln("ANALIZE SUCCESSFUL.");
+        displayService.showln(delimiter);
+
+        // initializes board
+        displayService.showln("INITIALIZES BOARD...");
+        Board board = new Board(listParsed);
+        if ((board.getSetOfCell() == null) || (board.getSetOfSquare() == null)) {
+            displayService.showlnErr("board.getSetOfCell(): " + board.getSetOfCell() + " and board.getSetOfSquare():" + board.getSetOfSquare());
+            displayService.showln("INITIALIZATION UNSUCCESSFUL.");
+            displayService.showln(delimiter);
+            return;
+        }
+        displayService.showBoard(board);
+        displayService.showln("INITIALIZATION SUCCESSFUL.");
+        displayService.showln(delimiter);
+
+        // finding solutions
+        displayService.showln("FINDING SOLUTIONS...");
+        Solutions solutions = ganeSolver.findSolution(board);
+        displayService.showSolutions(solutions);
+        displayService.showln("SOLUTIONS FOUND SUCCESSFUL.");
+        displayService.showln(delimiter);
     }
 }

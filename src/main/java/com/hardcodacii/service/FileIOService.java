@@ -3,12 +3,8 @@ package com.hardcodacii.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 /**
  * @author Dumitru Săndulache (sandulachedumitru@hotmail.com)
@@ -16,13 +12,12 @@ import java.nio.file.Paths;
 
 @Service
 @RequiredArgsConstructor
-public class FileIOServiceImpl {
-    private static final String resultFile = "SudokuResults.txt";
-    private static BufferedWriter outputFile;
+public class FileIOService {
+    private static final String RESULT_FILE = "SudokuResults.txt";
 
     private final DisplayService displayService;
 
-    public boolean exists(String path) {
+    public boolean fileExists(String path) {
         boolean fileExists = false;
 
         Path pathSource = Paths.get(path);
@@ -42,14 +37,34 @@ public class FileIOServiceImpl {
         return fileExists;
     }
 
-    public void writeToFile(String str) {
+    public boolean writeStringToFile(String str) {
+        Path filePath = Paths.get(RESULT_FILE);
+        boolean isSuccessfulWriting = false;
+
         try {
-            outputFile.write(str);
-            outputFile.flush();
-            outputFile.close();
-        } catch (IOException ex) {
-            System.err.println("Error when processing file in method writeToFile(); exiting ... ");
-            System.err.println(ex);
+            Files.writeString(filePath, str, StandardOpenOption.CREATE);
+            isSuccessfulWriting = true;
+            displayService.showln("Successful write to file");
+        } catch (IOException ioe) {
+            displayService.showlnErr("Failed to write to file");
+            displayService.show(ioe);
         }
+
+        return isSuccessfulWriting;
+    }
+
+    public String readStringFromFile(String path) {
+        Path filePath = Paths.get(path);
+        String content = null;
+
+        try {
+            content = Files.readString(filePath);
+            displayService.showln("Successful read from file");
+        } catch (IOException ioe) {
+            displayService.showlnErr("Failed to read from file");
+            displayService.show(ioe);
+        }
+
+        return content;
     }
 }
