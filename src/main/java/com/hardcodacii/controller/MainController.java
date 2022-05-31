@@ -88,5 +88,5 @@ public class MainController {
             displayService.showln("SOLUTIONS FOUND SUCCESSFUL."); displayService.showln(delimiter);
             
         }//end if
-    }//end method  main
-}//end class Main
+    }
+}

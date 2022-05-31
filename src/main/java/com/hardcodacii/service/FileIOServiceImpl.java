@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 @Service
 @RequiredArgsConstructor
 public class FileIOServiceImpl {
-    private static final String dstFile = "SudokuResults.txt";
+    private static final String resultFile = "SudokuResults.txt";
     private static BufferedWriter outputFile;
 
     private final DisplayService displayService;
@@ -42,7 +42,7 @@ public class FileIOServiceImpl {
         return fileExists;
     }
 
-    public void writeToFile (String str) {
+    public void writeToFile(String str) {
         try {
             outputFile.write(str);
             outputFile.flush();

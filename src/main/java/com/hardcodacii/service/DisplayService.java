@@ -30,14 +30,14 @@ public class DisplayService {
             System.out.println(obj);
             logChacheService.showln(obj);
         }
-    }//end method
+    }
 
     public void show(Object obj) {
         if (SHOW) {
             System.out.print(obj);
             logChacheService.show(obj);
         }
-    }//end method
+    }
 
     public void showlnErr(Object obj) {
         if (SHOW) {
@@ -45,7 +45,7 @@ public class DisplayService {
             System.err.println(suffix + obj);
             logChacheService.showlnErr(obj);
         }
-    }//end method
+    }
 
     public void showErr(Object obj) {
         if (SHOW) {
@@ -53,11 +53,11 @@ public class DisplayService {
             System.err.print(suffix + obj);
             logChacheService.showErr(obj);
         }
-    }//end method
+    }
     
     public void showBoard (Board board) {
         int countSquare = 1;
-        int countCell = 1;
+        int countCell;
         showln("\tNUMBER OF ROWS AND COLUMNS: " + board.getNumberOfRowsAndColumns()); showln("");
         showln("\tLISTING OF SQUARE");
         for (Square square : board.getSetOfSquare()) {
@@ -83,7 +83,6 @@ public class DisplayService {
         showln("");
         
         countCell = 1;
-        countSquare = 1;
         showln("\tLISTING OF INITIAL CELLS");
         for(Cell cell : board.getSetOfCell()) {
             show("\tCell[" + countCell + "]:");
@@ -100,7 +99,7 @@ public class DisplayService {
         //afiseaza board.arrayListOfCell
         Cell cell;
         List<Cell> listOfCell;
-        int row = 1, column = 1;
+        int row = 1, column;
         Iterator<List<Cell>> listIterator = board.getArrayListOfCell().iterator();
         showln("\tDISPLAYS BOARD ARRAY");
         while (listIterator.hasNext()) {
@@ -112,9 +111,7 @@ public class DisplayService {
             column = 1;
             while (cellIterator.hasNext()) {
                 cell = cellIterator.next();
-                
-//                show("\tCol[" + column + "]:" + cell.getValue() + "\\" + cell.getSquareOfCell() + "[" + cell.getSquareOfCell().getRow() + 
-//                        "," + cell.getSquareOfCell().getColumn() + "]");
+
                 show("\tCol[" + column + "]:" + cell.getValue());
 
                 column++;
@@ -122,7 +119,7 @@ public class DisplayService {
             showln("");
         }
         showln("");
-    }//end method
+    }
     
     public void showSolutions (Solutions solutions) {
         if ( solutions != null ) {
@@ -145,7 +142,7 @@ public class DisplayService {
                 }
             }
         }
-    }//end method
+    }
     
     public void showDebug(Object obj) {
         if (SHOW_DEBUG) showln(obj);
@@ -158,4 +155,4 @@ public class DisplayService {
     public void setShowDebug(boolean showDebug) {
         SHOW_DEBUG = showDebug;
     }
-}//end class
+}
