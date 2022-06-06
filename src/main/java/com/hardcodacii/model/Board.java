@@ -151,9 +151,9 @@ public class  Board {
     }//end constructor
     
     /**
-     * Metoda afla o celula in functie de linia si coloana ei.
-     * @param row linia celulei
-     * @param column coloana celulei
+     * The method finds a cell according to its row and column.
+     * @param row cell's row
+     * @param column cell's column
      * @return celula aflata. Daca linia si coloana nu se incadreaza in spectrul de valori atunci se returneaza o celula == null.
      */
     public Cell getCellFromCoordinate(Integer row, Integer column) {
