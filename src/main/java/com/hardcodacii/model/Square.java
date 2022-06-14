@@ -3,6 +3,7 @@ package com.hardcodacii.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Set;
 @Setter
 public class Square extends Element {
     
-    private Set<Cell> setOfCell;
+    private Set<Cell> setOfCell = new HashSet<>();
 
     public Square() {
         super(null, null);

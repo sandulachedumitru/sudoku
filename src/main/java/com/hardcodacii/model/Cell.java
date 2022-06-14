@@ -13,7 +13,7 @@ public class Cell extends Element {
     
     private Square squareOfCell;
     private Integer value;
-    private boolean isOriginal = false;
+    private boolean fromInput = false;
 
     public Cell() {
         super(null, null);

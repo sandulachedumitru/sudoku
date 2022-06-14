@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.hardcodacii.service.DisplayService.delimiter;
@@ -25,7 +26,7 @@ public class MainController {
     private final DisplayService displayService;
     private final FileIOService fileIOService;
     private final TokenizeService tokenizeService;
-    private final GaneSolver ganeSolver;
+    private final GameSolver ganeSolver;
 
     public void start(String[] args) {
         // checks if the user enters filename parameter; more than 1 parameter will be ignored
@@ -66,7 +67,7 @@ public class MainController {
         displayService.showln(delimiter);
 
         // analyze the resulting tokens string list
-        displayService.showln("ANALIZE THE LIST OF TOKENS...");
+        displayService.showln("ANALYZE THE LIST OF TOKENS...");
         if (listOfWords == null) {
             displayService.showln("CONTENT OF THE INPUT DATA FILE IS NOT VALID. EXITING APP...");
             displayService.showln(delimiter);
@@ -77,18 +78,18 @@ public class MainController {
             listParsed = tokenizeService.analizeTokenizedList(listOfWords);
         } catch (IllegalArgumentException iae) {
             displayService.showlnErr(iae);
-            displayService.showln("ANALIZE UNSUCCESSFUL. SYSTEM WILL EXIT.");
+            displayService.showln("ANALYZE UNSUCCESSFUL. SYSTEM WILL EXIT.");
             displayService.showln(delimiter);
             return;
         }
-        displayService.showln("ANALIZE SUCCESSFUL.");
+        displayService.showln("ANALYZE SUCCESSFUL.");
         displayService.showln(delimiter);
 
         // initializes board
         displayService.showln("INITIALIZES BOARD...");
         Board board = new Board(listParsed);
-        if ((board.getSetOfCell() == null) || (board.getSetOfSquare() == null)) {
-            displayService.showlnErr("board.getSetOfCell(): " + board.getSetOfCell() + " and board.getSetOfSquare():" + board.getSetOfSquare());
+        if ((board.getInputCells() == null) || (board.getBoardSquares() == null)) {
+            displayService.showlnErr("board.getSetOfCell(): " + board.getInputCells() + " and board.getSetOfSquare():" + Arrays.toString(board.getBoardSquares()));
             displayService.showln("INITIALIZATION UNSUCCESSFUL.");
             displayService.showln(delimiter);
             return;

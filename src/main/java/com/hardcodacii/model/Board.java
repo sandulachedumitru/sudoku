@@ -15,168 +15,127 @@ public class  Board {
         // the order in which the enumerations are written is important
         ROW, COLUMN, VALUE
     }
-    
-    private int numberOfRowsAndColumns = 0;
-    private Set<Cell> setOfCell = null;
-    private Set<Square> setOfSquare = null;
-    private List<List<Cell>> arrayListOfCell = null;
+
+    private int squareDimension;
+    private int boardDimension;
+    private Set<Cell> inputCells = new HashSet<>();;
+    private Square[] boardSquares;
+    private Cell[] boardCells;
 
     // used internally
     private Board() {}
 
     /**
      * Constructor in which the game grid is initialized.
-     * @param listFileParsed list of values taken from the input file. The first value in the list is the number of rows and columns of squares (format: 2x2, 3x3, 4x4, etc).
+     * @param parsedFile list of values taken from the input file. The first value in the list is the number of rows and columns of squares (format: 2x2, 3x3, 4x4, etc).
      * For a square N x N then the number of cells = N ^ 2, rows = columns = N (ex: 3x3 => 3 ^ 2 = 9)
      */
-    public Board(List<Integer> listFileParsed) {
+    public Board(List<Integer> parsedFile) {
+        if (parsedFile != null) {
+            createCellsFromInputFile(parsedFile);
+            boardInit();
+        }
+    }
+
+    private void createCellsFromInputFile(List<Integer> parsedFile) {
         // the first positive integer from the input file which specifies the number of rows and columns from a square
         boolean isFirst = true;
-        // specify that a cell that has value could be built. A valid cell has coordinates and value (row, column, value)
-        boolean makeCell = true;
-        // specify that a cell has all three values (row, column, value) and can be built
-        boolean pass = false;
         // count is a number from 1 to 3 that specifies for a cell whether a number is
         // either for a row, for a column, or for a cell value (0 for row, 1 for column, 2 for value)
         int count = 1;
 
-        Cell cell = null; Square square;
-
         // create the set of all cells defined in the input file
-        for (Integer listInt : listFileParsed) {
-            if (makeCell) {
-                cell = new Cell();
-                makeCell = false;
-            }
-
+        int row = 0, col = 0, value = 0;
+        for (Integer listInt : parsedFile) {
             if (isFirst) {
-                numberOfRowsAndColumns = listInt;
-                isFirst = false;               
+                squareDimension = listInt;
+                isFirst = false;
             } else {
                 if (count <= CoordinateType.values().length) {
                     switch (CoordinateType.values()[count-1]) {
                         case ROW:
-                            cell.setRow(listInt);
+                            row = listInt;
                             break;
                         case COLUMN:
-                            cell.setColumn(listInt);
+                            col = listInt;
                             break;
                         case VALUE:
-                            cell.setValue(listInt);
-                            pass = true;
+                            value = listInt;
+
+                            Cell cell = new Cell(row, col);
+                            cell.setValue(value);
+                            cell.setFromInput(true);
+                            inputCells.add(cell);
+
+                            count = 1;
                             break;
                     }
                     count++;
-                } //end if
-                if (pass) {
-                    cell.setOriginal(true);
-                    
-                    count = 1;
-                    makeCell = true; pass = false;
-                    
-                    if (setOfCell == null) setOfCell = new HashSet<>();
-                    setOfCell.add(cell);
-                }//end if
-            }//end else
-        }//end for
-        
-        // create and init the actual board (arrayListOfCell)
-        if (setOfCell != null) {
-            //copy setOfCell into soc
-            Iterator<Cell> iteratorCell = setOfCell.iterator();
-            Set<Cell> soc = new HashSet<>();
-            while (iteratorCell.hasNext()) soc.add(iteratorCell.next());
-
-            // init the board
-            int boardDimension = numberOfRowsAndColumns*numberOfRowsAndColumns;
-            arrayListOfCell = new ArrayList<>();
-            List<Cell> listOfCell;
-            for (int row = 1; row <= (boardDimension); row++) {
-                listOfCell = new ArrayList<>();
-                arrayListOfCell.add(listOfCell);
-                for (int column = 1; column <= (boardDimension); column++) {
-                    cell = new Cell(row , column);
-
-                    boolean flagCell = true;
-                    Cell localCell;
-                    Iterator<Cell> iterator = soc.iterator();
-                    while (flagCell && iterator.hasNext()) {
-                        localCell = iterator.next();
-                        if (cell.equals(localCell)) {
-                            flagCell = false;
-                            cell = localCell;
-                            soc.remove(localCell);
-                        }
-                    }
-                    Integer rowOfSquare = ((cell.getRow() % numberOfRowsAndColumns) == 0) ? (cell.getRow() / numberOfRowsAndColumns) : (cell.getRow() / numberOfRowsAndColumns) + 1;
-                    Integer columnOfSquare = ((cell.getColumn() % numberOfRowsAndColumns) == 0) ? (cell.getColumn() / numberOfRowsAndColumns) : (cell.getColumn() / numberOfRowsAndColumns) + 1;
-                    square = new Square(rowOfSquare, columnOfSquare);
-                    
-                    if (setOfSquare != null) {
-                        if (setOfSquare.contains(square)) {
-                            Iterator<Square> it = setOfSquare.iterator();
-                            boolean flagSquare = true;
-                            Square sq;
-                            while (flagSquare && it.hasNext()) {
-                                sq = it.next();
-                                if (sq.equals(square)) {
-                                    flagSquare = false;
-                                    square = sq;
-                                }
-                            }
-                            if (square.getSetOfCell() != null) {
-                                square.getSetOfCell().add(cell);
-                            } else {
-                                square.setSetOfCell(new HashSet<>());
-                                square.getSetOfCell().add(cell);
-                            }
-                        } else {
-                            square.setSetOfCell(new HashSet<>());
-                            square.getSetOfCell().add(cell);
-                            setOfSquare.add(square);
-                        }
-                    } else {
-                        setOfSquare = new HashSet<>();
-                        square.setSetOfCell(new HashSet<>());
-                        square.getSetOfCell().add(cell);
-                        setOfSquare.add(square);
-                    }
-                    
-                    cell.setSquareOfCell(square);
-                    listOfCell.add(cell);
-                }//end for column
-            }//end for row
-        }//end if
-        
-    }//end constructor
-    
-    /**
-     * The method finds a cell according to its row and column.
-     * @param row cell's row
-     * @param column cell's column
-     * @return celula aflata. Daca linia si coloana nu se incadreaza in spectrul de valori atunci se returneaza o celula == null.
-     */
-    public Cell getCellFromCoordinate(Integer row, Integer column) {
-        if ((1 <= row) && (row <= numberOfRowsAndColumns*numberOfRowsAndColumns) && (1 <= column) && (column <= numberOfRowsAndColumns*numberOfRowsAndColumns)) {
-            Cell cell;
-            List<Cell> listOfCell;
-            Iterator<List<Cell>> listIterator = arrayListOfCell.iterator();
-            while (listIterator.hasNext()) {
-                listOfCell = listIterator.next();
-                Iterator<Cell> cellIterator = listOfCell.iterator();
-                while (cellIterator.hasNext()) {
-                    cell = cellIterator.next();
-                    if ((cell.getRow() == row) && (cell.getColumn() == column)) return cell;
                 }
             }
-        }//end if
+        }
+    }
+
+    private void boardInit() {
+
+        // define the board and its elements
+        boardDimension = squareDimension * squareDimension;
+        boardCells = new Cell[boardDimension * boardDimension];
+        boardSquares = new Square[boardDimension];
+
+        // init the element with coordinates
+        initElementWithCoordinates(boardCells);
+        initElementWithCoordinates(boardSquares);
+
+        // init board with input value
+        for (Cell inpCell : inputCells) {
+            Cell cell = getCellFromCoordinate(inpCell.getRow(), inpCell.getColumn());
+            cell.setValue(inpCell.getValue());
+            cell.setFromInput(true);
+        }
+
+        // link cell with square
+        for (Cell cell : boardCells) {
+            Square square = getSquareFromCell(cell);
+            square.getSetOfCell().add(cell);
+            cell.setSquareOfCell(square);
+        }
+    }
+
+    private void initElementWithCoordinates(Element[] element) {
+        Double sqrt = Math.sqrt(element.length);
+        int dimension = sqrt.intValue();
+        for (int row = 1; row <= element.length; row++)
+            for (int col = 1; col <= element.length; col++) {
+                Element el = element[(row  -1) * dimension + (col -1)];
+                el.setRow(row);;
+                el.setColumn(col);
+            }
+    }
+
+    public Cell getCellFromCoordinate(int row, int column) {
+        int boardDimension = squareDimension * squareDimension;
+        if ((1 <= row) && (row <= boardDimension) && (1 <= column) && (column <= boardDimension) && boardCells.length == boardDimension * boardDimension)
+            return boardCells[(row -1) * boardDimension + (column -1)];
+        return null;
+    }
+
+    public Square getSquareFromCell(Cell cell) {
+        int squareRow = (cell.getRow() % squareDimension) == 0 ? (cell.getRow() / squareDimension) : (cell.getRow() / squareDimension) + 1;
+        int  squareColumn = (cell.getColumn() % squareDimension == 0) ? (cell.getColumn() / squareDimension) : (cell.getColumn() / squareDimension) + 1;
+        return new Square(squareRow, squareColumn);
+    }
+
+    public Square getSquareFromCoordinate(int row, int column) {
+        int boardDimension = squareDimension * squareDimension;
+        if ((1 <= row) && (row <= squareDimension) && (1 <= column) && (column <= squareDimension) && boardSquares.length == boardDimension)
+            return boardSquares[(row -1) * squareDimension + (column -1)];
         return null;
     }
     
     /**
-     * Metoda copiaza arrayListOfCell. Metoda e folosita ptr a inregistra solutiile din metoda findSolaution(Board solution).
-     * @param board solutia
-     * @return copie arrayListOfCell a solutiei
+     * @param board solution
+     * @return arrayListOfCell solution copy
      */
     public static Board copySolutionResults (Board board) {
         Board boardCopy = null;
@@ -186,9 +145,9 @@ public class  Board {
         if ( board != null ) {
             boardCopy = new Board();
             
-            boardCopy.numberOfRowsAndColumns = board.numberOfRowsAndColumns;
+            boardCopy.squareDimension = board.squareDimension;
 
-            Iterator<List<Cell>> listIterator = board.arrayListOfCell.iterator();
+            Iterator<List<Cell>> listIterator = board.boardCells.iterator();
             List<Cell> listOfCells;
             if ( listIterator.hasNext() ) copyArrayListOfCell = new ArrayList<>();
             while (listIterator.hasNext()) {
@@ -202,12 +161,12 @@ public class  Board {
                     cellClone.setRow(cell.getRow());
                     cellClone.setColumn(cell.getColumn());
                     cellClone.setValue(cell.getValue());
-                    cellClone.setOriginal(cell.isOriginal());
+                    cellClone.setFromInput(cell.isFromInput());
                     copyListOfCells.add(cellClone);
                 }
                 copyArrayListOfCell.add(copyListOfCells);
             }//end while
-            boardCopy.arrayListOfCell = copyArrayListOfCell;
+            boardCopy.boardCells = copyArrayListOfCell;
         }//end if
         
         return boardCopy;

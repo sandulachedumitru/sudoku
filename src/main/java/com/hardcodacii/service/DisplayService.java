@@ -58,9 +58,9 @@ public class DisplayService {
     public void showBoard (Board board) {
         int countSquare = 1;
         int countCell;
-        showln("\tNUMBER OF ROWS AND COLUMNS: " + board.getNumberOfRowsAndColumns()); showln("");
+        showln("\tNUMBER OF ROWS AND COLUMNS: " + board.getSquareDimension()); showln("");
         showln("\tLISTING OF SQUARE");
-        for (Square square : board.getSetOfSquare()) {
+        for (Square square : board.getBoardSquares()) {
             show("\tSquare[" + countSquare + "]:");
             show("\tROW: " + square.getRow());
             show("\tCOLUMN: " + square.getColumn()); showln("");
@@ -84,7 +84,7 @@ public class DisplayService {
         
         countCell = 1;
         showln("\tLISTING OF INITIAL CELLS");
-        for(Cell cell : board.getSetOfCell()) {
+        for(Cell cell : board.getInputCells()) {
             show("\tCell[" + countCell + "]:");
             show("\trow: " + cell.getRow());
             show("\tcolumn: " + cell.getColumn());
@@ -100,7 +100,7 @@ public class DisplayService {
         Cell cell;
         List<Cell> listOfCell;
         int row = 1, column;
-        Iterator<List<Cell>> listIterator = board.getArrayListOfCell().iterator();
+        Iterator<List<Cell>> listIterator = board.getBoardCells().iterator();
         showln("\tDISPLAYS BOARD ARRAY");
         while (listIterator.hasNext()) {
             listOfCell = listIterator.next();
@@ -123,11 +123,11 @@ public class DisplayService {
     
     public void showSolutions (Solutions solutions) {
         if ( solutions != null ) {
-            Iterator<Board> listOfSolutions = solutions.getListOfSolutions().iterator();
+            Iterator<Board> listOfSolutions = solutions.getSolutions().iterator();
             int countSolutions = 0;
             while (listOfSolutions.hasNext()) {
                 showln("\tSOLUTION:" + ++countSolutions);
-                Iterator<List<Cell>> listIterator = listOfSolutions.next().getArrayListOfCell().iterator();
+                Iterator<List<Cell>> listIterator = listOfSolutions.next().getBoardCells().iterator();
                 List<Cell> listOfCell;
                 while (listIterator.hasNext()) {
                     listOfCell = listIterator.next();

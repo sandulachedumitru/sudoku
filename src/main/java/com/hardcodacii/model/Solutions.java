@@ -12,5 +12,5 @@ import java.util.List;
 @Getter
 @Setter
 public class Solutions {
-    private List<Board> listOfSolutions;
+    private List<Board> solutions;
 }
