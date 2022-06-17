@@ -58,6 +58,7 @@ public class DisplayService {
     public void showBoard (Board board) {
         int countSquare = 1;
         int countCell;
+
         showln("\tNUMBER OF ROWS AND COLUMNS: " + board.getSquareDimension()); showln("");
         showln("\tLISTING OF SQUARE");
         for (Square square : board.getBoardSquares()) {
@@ -67,7 +68,7 @@ public class DisplayService {
             countCell = 1;
             for (Cell cell : square.getSetOfCell()) {
                 show("\t\t");
-                show("CELL[" + countCell + "]:");
+                show("CELL[" + countCell++ + "]:");
                 show(" row:" + cell.getRow());
                 show(" column:" + cell.getColumn());
                 show(" value:" + cell.getValue());
@@ -76,45 +77,32 @@ public class DisplayService {
                 show("COLUMN:" + cell.getSquareOfCell().getColumn());
                 show("]");
                 showln("");
-                countCell++;
             }
             countSquare++;
-        }//end for
+        }
         showln("");
         
         countCell = 1;
         showln("\tLISTING OF INITIAL CELLS");
         for(Cell cell : board.getInputCells()) {
-            show("\tCell[" + countCell + "]:");
+            show("\tCell[" + countCell++ + "]:");
             show("\trow: " + cell.getRow());
             show("\tcolumn: " + cell.getColumn());
             show("\tvalue: " + cell.getValue());
             show("\tSquare: ");
             show("ROW:" + cell.getSquareOfCell().getRow());
             showln("\tCOLUMN:" + cell.getSquareOfCell().getColumn());
-            countCell++;
         }//end for
         showln("");
         
-        //afiseaza board.arrayListOfCell
-        Cell cell;
-        List<Cell> listOfCell;
-        int row = 1, column;
-        Iterator<List<Cell>> listIterator = board.getBoardCells().iterator();
+        // display the board
+        Cell[] cells = board.getBoardCells();
         showln("\tDISPLAYS BOARD ARRAY");
-        while (listIterator.hasNext()) {
-            listOfCell = listIterator.next();
-            Iterator<Cell> cellIterator = listOfCell.iterator();
-            
-            show("\tRow[" + row + "]: ");
-            row++;
-            column = 1;
-            while (cellIterator.hasNext()) {
-                cell = cellIterator.next();
-
+        for (int row = 1; row <= board.getBoardDimension(); row++) {
+            show("\tRow[" + row++ + "]: ");
+            for (int column = 1; column <= board.getBoardDimension(); column++) {
+                var cell = cells[(row -1) * board.getBoardDimension() + (column -1)];
                 show("\tCol[" + column + "]:" + cell.getValue());
-
-                column++;
             }
             showln("");
         }
@@ -122,24 +110,36 @@ public class DisplayService {
     }
     
     public void showSolutions (Solutions solutions) {
+//        if ( solutions != null ) {
+//            Iterator<Board> listOfSolutions = solutions.getSolutions().iterator();
+//            int countSolutions = 0;
+//            while (listOfSolutions.hasNext()) {
+//                showln("\tSOLUTION:" + ++countSolutions);
+//                Iterator<List<Cell>> listIterator = listOfSolutions.next().getBoardCells().iterator();
+//                List<Cell> listOfCell;
+//                while (listIterator.hasNext()) {
+//                    listOfCell = listIterator.next();
+//                    Iterator<Cell> cellIterator = listOfCell.iterator();
+//                    Cell cell;
+//                    show("\t");
+//                    while (cellIterator.hasNext()) {
+//                        cell = cellIterator.next();
+//                        show("\t[" + cell.getRow() + "-" + cell.getColumn() + "-" + cell.getValue() + "]");
+//                    }
+//                    showln("");
+//                }
+//            }
+//        }
+
         if ( solutions != null ) {
-            Iterator<Board> listOfSolutions = solutions.getSolutions().iterator();
-            int countSolutions = 0;
-            while (listOfSolutions.hasNext()) {
+            var countSolutions = 0;
+            for (var board : solutions.getSolutions()) {
                 showln("\tSOLUTION:" + ++countSolutions);
-                Iterator<List<Cell>> listIterator = listOfSolutions.next().getBoardCells().iterator();
-                List<Cell> listOfCell;
-                while (listIterator.hasNext()) {
-                    listOfCell = listIterator.next();
-                    Iterator<Cell> cellIterator = listOfCell.iterator();
-                    Cell cell;
-                    show("\t");
-                    while (cellIterator.hasNext()) {
-                        cell = cellIterator.next();
-                        show("\t[" + cell.getRow() + "-" + cell.getColumn() + "-" + cell.getValue() + "]");
-                    }
-                    showln("");
+//                show("\t");
+                for (var cell : board.getBoardCells()) {
+                    show("\t[" + cell.getRow() + "-" + cell.getColumn() + "-" + cell.getValue() + "]");
                 }
+                showln("");
             }
         }
     }

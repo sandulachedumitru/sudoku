@@ -18,7 +18,7 @@ public class  Board {
 
     private int squareDimension;
     private int boardDimension;
-    private Set<Cell> inputCells = new HashSet<>();;
+    private final Set<Cell> inputCells = new HashSet<>();
     private Square[] boardSquares;
     private Cell[] boardCells;
 
@@ -43,12 +43,15 @@ public class  Board {
         // count is a number from 1 to 3 that specifies for a cell whether a number is
         // either for a row, for a column, or for a cell value (0 for row, 1 for column, 2 for value)
         int count = 1;
+        boolean isCellCreated = false;
+
+        int row = 0, col = 0;
 
         // create the set of all cells defined in the input file
-        int row = 0, col = 0, value = 0;
         for (Integer listInt : parsedFile) {
             if (isFirst) {
                 squareDimension = listInt;
+                boardDimension = squareDimension * squareDimension;
                 isFirst = false;
             } else {
                 if (count <= CoordinateType.values().length) {
@@ -60,17 +63,19 @@ public class  Board {
                             col = listInt;
                             break;
                         case VALUE:
-                            value = listInt;
-
                             Cell cell = new Cell(row, col);
-                            cell.setValue(value);
+                            cell.setValue(listInt);
                             cell.setFromInput(true);
                             inputCells.add(cell);
+                            isCellCreated = true;
 
                             count = 1;
                             break;
                     }
-                    count++;
+                    if (isCellCreated) {
+                        isCellCreated = false;
+                        count = 1;
+                    } else count++;
                 }
             }
         }
@@ -79,13 +84,12 @@ public class  Board {
     private void boardInit() {
 
         // define the board and its elements
-        boardDimension = squareDimension * squareDimension;
         boardCells = new Cell[boardDimension * boardDimension];
         boardSquares = new Square[boardDimension];
 
         // init the element with coordinates
-        initElementWithCoordinates(boardCells);
-        initElementWithCoordinates(boardSquares);
+        initCellWithCoordinates(boardCells);
+        initSquareWithCoordinates(boardSquares);
 
         // init board with input value
         for (Cell inpCell : inputCells) {
@@ -102,15 +106,18 @@ public class  Board {
         }
     }
 
-    private void initElementWithCoordinates(Element[] element) {
-        Double sqrt = Math.sqrt(element.length);
-        int dimension = sqrt.intValue();
-        for (int row = 1; row <= element.length; row++)
-            for (int col = 1; col <= element.length; col++) {
-                Element el = element[(row  -1) * dimension + (col -1)];
-                el.setRow(row);;
-                el.setColumn(col);
-            }
+    private void initCellWithCoordinates(Cell[] cells) {
+        int dimension = (int) Math.sqrt(cells.length);
+        for (int row = 1; row <= dimension; row++)
+            for (int col = 1; col <= dimension; col++)
+                cells[(row  -1) * dimension + (col -1)] = new Cell(row, col);
+    }
+
+    private void initSquareWithCoordinates(Square[] squares) {
+        int dimension = (int) Math.sqrt(squares.length);
+        for (int row = 1; row <= dimension; row++)
+            for (int col = 1; col <= dimension; col++)
+                squares[(row  -1) * dimension + (col -1)] = new Square(row, col);
     }
 
     public Cell getCellFromCoordinate(int row, int column) {
@@ -137,39 +144,34 @@ public class  Board {
      * @param board solution
      * @return arrayListOfCell solution copy
      */
-    public static Board copySolutionResults (Board board) {
-        Board boardCopy = null;
-        List<Cell> copyListOfCells = null;
-        List<List<Cell>> copyArrayListOfCell = null;
-        
-        if ( board != null ) {
-            boardCopy = new Board();
-            
-            boardCopy.squareDimension = board.squareDimension;
+    public static Board copySolutionResults(Board board) {
+        return board != null ? (Board) board.clone() : null;
+    }
 
-            Iterator<List<Cell>> listIterator = board.boardCells.iterator();
-            List<Cell> listOfCells;
-            if ( listIterator.hasNext() ) copyArrayListOfCell = new ArrayList<>();
-            while (listIterator.hasNext()) {
-                listOfCells = listIterator.next();
-                Iterator<Cell> cellIterator = listOfCells.iterator();
-                Cell cell;
-                copyListOfCells = new ArrayList<>();
-                while (cellIterator.hasNext()) {
-                    cell = cellIterator.next();
-                    Cell cellClone = new Cell();
-                    cellClone.setRow(cell.getRow());
-                    cellClone.setColumn(cell.getColumn());
-                    cellClone.setValue(cell.getValue());
-                    cellClone.setFromInput(cell.isFromInput());
-                    copyListOfCells.add(cellClone);
-                }
-                copyArrayListOfCell.add(copyListOfCells);
-            }//end while
-            boardCopy.boardCells = copyArrayListOfCell;
-        }//end if
-        
+    @Override
+    public Object clone() {
+        Cell[] boardCellClone = new Cell[this.boardCells.length];
+        int index = 0;
+        for (Cell cell : this.boardCells) {
+            var cellClone = new Cell();
+            cellClone.setRow(cell.getRow());
+            cellClone.setColumn(cell.getColumn());
+            cellClone.setValue(cell.getValue());
+            cellClone.setSquareOfCell(cell.getSquareOfCell());
+            boardCellClone[index++] = cellClone;
+        }
+
+        Board boardCopy;
+        try {
+            boardCopy = (Board) super.clone();
+        } catch (CloneNotSupportedException e) {
+            boardCopy = new Board();
+        }
+        boardCopy.squareDimension = this.squareDimension;
+        boardCopy.boardDimension = this.boardDimension;
+        boardCopy.boardSquares = this.boardSquares.clone();
+        boardCopy.boardCells = boardCellClone;
+
         return boardCopy;
     }
-    
-}//end class
+}

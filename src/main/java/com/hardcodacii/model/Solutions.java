@@ -3,7 +3,7 @@ package com.hardcodacii.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
@@ -12,5 +12,5 @@ import java.util.List;
 @Getter
 @Setter
 public class Solutions {
-    private List<Board> solutions;
+    private Set<Board> solutions;
 }

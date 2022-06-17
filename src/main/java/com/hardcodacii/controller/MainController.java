@@ -73,9 +73,9 @@ public class MainController {
             displayService.showln(delimiter);
             return;
         }
-        List<Integer> listParsed;
+        List<Integer> parsedFile;
         try {
-            listParsed = tokenizeService.analizeTokenizedList(listOfWords);
+            parsedFile = tokenizeService.analizeTokenizedList(listOfWords);
         } catch (IllegalArgumentException iae) {
             displayService.showlnErr(iae);
             displayService.showln("ANALYZE UNSUCCESSFUL. SYSTEM WILL EXIT.");
@@ -87,7 +87,7 @@ public class MainController {
 
         // initializes board
         displayService.showln("INITIALIZES BOARD...");
-        Board board = new Board(listParsed);
+        Board board = new Board(parsedFile);
         if ((board.getInputCells() == null) || (board.getBoardSquares() == null)) {
             displayService.showlnErr("board.getSetOfCell(): " + board.getInputCells() + " and board.getSetOfSquare():" + Arrays.toString(board.getBoardSquares()));
             displayService.showln("INITIALIZATION UNSUCCESSFUL.");

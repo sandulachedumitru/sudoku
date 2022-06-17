@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 /**
@@ -58,7 +59,7 @@ public class GameSolver {
                         createSolution = false;
                        // solutions.getInstance().setListOfSolutions(new ArrayList<>());
                         solutions = new Solutions();
-                        solutions.setSolutions(new ArrayList<>());
+                        solutions.setSolutions(new HashSet<>());
                     }
                     solutions.getSolutions().add(Board.copySolutionResults(solution));
                 }
