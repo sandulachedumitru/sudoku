@@ -130,7 +130,7 @@ public class  Board {
     public Square getSquareFromCell(Cell cell) {
         int squareRow = (cell.getRow() % squareDimension) == 0 ? (cell.getRow() / squareDimension) : (cell.getRow() / squareDimension) + 1;
         int  squareColumn = (cell.getColumn() % squareDimension == 0) ? (cell.getColumn() / squareDimension) : (cell.getColumn() / squareDimension) + 1;
-        return new Square(squareRow, squareColumn);
+        return getSquareFromCoordinate(squareRow, squareColumn);
     }
 
     public Square getSquareFromCoordinate(int row, int column) {
