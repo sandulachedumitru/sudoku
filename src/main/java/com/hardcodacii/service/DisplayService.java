@@ -8,9 +8,6 @@ import com.hardcodacii.model.Square;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * Show logs and results
  * @author Sandulache Dumitru (sandulachedumitru@hotmail.com)
@@ -97,18 +94,8 @@ public class DisplayService {
         showln("");
         
         // display the board
-        Cell[] cells = board.getBoardCells();
         showln("\tDISPLAYS BOARD");
-        for (int row = 1; row <= board.getBoardDimension(); row++) {
-            show("\tRow[" + row + "]: ");
-            for (int column = 1; column <= board.getBoardDimension(); column++) {
-                var cell = cells[(row -1) * board.getBoardDimension() + (column -1)];
-                show("\tCol[" + column + "]:" + cell.getValue());
-            }
-            showln("");
-        }
-
-//        displayBoard(board);
+        displayBoard(board);
         showln("");
     }
     
@@ -117,23 +104,14 @@ public class DisplayService {
             var countSolutions = 0;
             for (var board : solutions.getSolutions()) {
                 showln("\tSOLUTION:" + ++countSolutions);
-                show("\t");
-                int dimension = 1;
-                for (var cell : board.getBoardCells()) {
-                    show("\t[" + cell.getRow() + "-" + cell.getColumn() + "-" + cell.getValue() + "]");
-                    if (dimension == board.getBoardDimension()) {
-                        dimension = 1;
-                        showln(""); show("\t");
-                    } else
-                        dimension++;
-                }
-//                displayBoard(board);
-
+                displayBoard(board);
+                showln("");
             }
         }
     }
 
     private void displayBoard(Board board) {
+        show("\t");
         int dimension = 1;
         for (var cell : board.getBoardCells()) {
             String value = cell.getValue() != null ? cell.getValue().toString() : " ";
@@ -142,6 +120,7 @@ public class DisplayService {
             if (dimension == board.getBoardDimension()) {
                 dimension = 1;
                 showln("");
+                show("\t");
             } else
                 dimension++;
         }
