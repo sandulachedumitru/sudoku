@@ -22,4 +22,12 @@ public class Cell extends Element {
     public Cell(Integer row, Integer column) {
         super(row, column);
     }
+
+    public void resetValue() {
+        value = null;
+    }
+
+    public boolean isEmptyValue() {
+        return value == null;
+    }
 }

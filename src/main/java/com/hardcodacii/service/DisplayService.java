@@ -18,7 +18,8 @@ import org.springframework.stereotype.Service;
 public class DisplayService {
     private boolean SHOW = true;
     private boolean SHOW_DEBUG = false;
-    public static final String delimiter = "------------------------------------------------------------------";
+    public static final String delimiterMinus = "------------------------------------------------------------------";
+    private static final String delimiterEqual = "=======================================================================================";
 
     private final LogChacheService logChacheService;
     
@@ -95,7 +96,7 @@ public class DisplayService {
         
         // display the board
         showln("\tDISPLAYS BOARD");
-        displayBoard(board);
+        displayBoardWithSquare(board);
         showln("");
     }
     
@@ -104,13 +105,40 @@ public class DisplayService {
             var countSolutions = 0;
             for (var board : solutions.getSolutions()) {
                 showln("\tSOLUTION:" + ++countSolutions);
-                displayBoard(board);
+                displayBoardWithSquare(board);
                 showln("");
             }
         }
     }
 
-    private void displayBoard(Board board) {
+    private void displayBoardWithSquare(Board board) {
+        System.out.print("\t");
+        int dimension = 1;
+        int squareParagraph = 1;
+        for (var cell : board.getBoardCells()) {
+            String value = cell.getValue() != null ? cell.getValue().toString() : " ";
+
+            System.out.print("\t[" + cell.getRow() + "-" + cell.getColumn() + "-" + value + "]");
+            if (dimension % board.getSquareDimension() == 0) {
+                if (dimension == board.getBoardDimension()) {
+                    squareParagraph++;
+                    dimension = 0;
+
+                    if (squareParagraph++ % board.getSquareDimension() == 0) {
+                        squareParagraph = 1;
+                        System.out.println();
+                    }
+                    System.out.println();
+                    System.out.print("\t");
+                } else
+                    System.out.print("\t");
+            }
+
+            dimension++;
+        }
+    }
+
+    private void displayBoardCompact(Board board) {
         show("\t");
         int dimension = 1;
         for (var cell : board.getBoardCells()) {

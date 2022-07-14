@@ -171,6 +171,7 @@ public class  Board {
         boardCopy.boardDimension = this.boardDimension;
         boardCopy.boardSquares = this.boardSquares.clone();
         boardCopy.boardCells = boardCellClone;
+        boardCopy.inputCells.addAll(this.inputCells);
 
         return boardCopy;
     }
