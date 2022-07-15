@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 public class DisplayService {
     private boolean SHOW = true;
     private boolean SHOW_DEBUG = false;
-    public static final String delimiterMinus = "------------------------------------------------------------------";
-    private static final String delimiterEqual = "=======================================================================================";
+    public static final String delimiterMinus   = "------------------------------------------------------------------";
+    private static final String delimiterEqual  = "==================================================================";
 
     private final LogChacheService logChacheService;
     
