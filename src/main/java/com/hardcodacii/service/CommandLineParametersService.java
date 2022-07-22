@@ -2,10 +2,9 @@ package com.hardcodacii.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,19 +16,32 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class CommandLineParametersService {
+
+
     public static void main(String... args) {
-        var cmdOptions = CmdOptions.initCmdOptions();
-        areFormattedParameters(args);
+        System.out.println(CmdOptions.sanitizeSingleSupportedOptionValue("-=ena bl -e+"));
+        System.out.println(CmdOptions.sanitizeSingleSupportedOptionValue("disable"));
+
+        CmdOptions.initCmdOptions();
+        System.out.println("optDesc size: " + CmdOptions.optDesc.size());
+        for (var od : CmdOptions.optDesc) {
+
+            System.out.println("cmd options: " + od);
+        }
+
+//        cmdParameterProcessor(args);
+
     }
 
-    public void cmdParameterProcessor(String... args) {
-        var cmdOptions = CmdOptions.initCmdOptions();
-
+    public static void cmdParameterProcessor(String... args) {
+        areFormattedParameters(args);
     }
 
     public static boolean areFormattedParameters(String... args) {
 
+        String regexForCmdParameters = "^([a-zA-Z0-9]+)(\\.[a-zA-Z0-9]+)?$";
         String regexForCmdOptions = "^(--[a-zA-Z]+[^0-9\\W])(=(\\w+))?$";
+
         Pattern pattern = Pattern.compile(regexForCmdOptions);
 
         boolean result = true;
@@ -44,6 +56,9 @@ public class CommandLineParametersService {
                 for (int g = 0; g <= matcher.groupCount(); g++) {
                     System.out.println("\t\tgroup[" + g + "]--> " + matcher.group(g));
                 }
+                if (matcher.group(2) == null && matcher.group(3) == null) {
+
+                }
             } else {
                 System.out.println("NO MATCH !");
                 result = false;
@@ -53,41 +68,108 @@ public class CommandLineParametersService {
         return result;
     }
 
+    @Getter
     private static class CmdOptions {
 
-        private static final HashSet<OptionsDescription> optDescr =new HashSet<>();
+        private static final HashSet<OptionsDescription> optDesc =new HashSet<>();
 
-        public CmdOptions() {
-            initCmdOptions();
+        private static void initCmdOptions() {
+            // --help
+            storeOptionsProperties("help", null, false, false);
+
+            // --debug
+            String[] supportedValues = new String[] {"disable", "enable"};
+            storeOptionsProperties("debug", supportedValues, true, false);
+
+            // --printTo
+            storeOptionsProperties("printTo", null, true, true);
         }
 
-        private static HashSet<OptionsDescription> initCmdOptions() {
-            OptionsDescription helpOptionDescription = new OptionsDescription();
-            helpOptionDescription.setParameterName("help");
-            helpOptionDescription.setUsageHelp("");
-            helpOptionDescription.setCanHaveValue(false);
-            optDescr.add(helpOptionDescription);
+        private static void storeOptionsProperties(
+                String optionName,
+                String[] supportedValues,
+                boolean supportOtherOptions,
+                boolean canHaveValue
+        ) {
+            String appName = "sudoku";
+            String prefix = "--";
 
-            OptionsDescription debugOptionDescription = new OptionsDescription();
-            debugOptionDescription.setParameterName("debug");
-            debugOptionDescription.setUsageHelp("");
-            debugOptionDescription.setCanHaveValue(true);
-            optDescr.add(debugOptionDescription);
+            String _optionName, _usageHelp = "", _messageSignalsTheUseOfDefaultValue;
+            String _defaultSupportedValue;
+            String[] _supportedValues;
 
-            OptionsDescription printOptionDescription = new OptionsDescription();
-            printOptionDescription.setParameterName("print");
-            printOptionDescription.setUsageHelp("");
-            printOptionDescription.setCanHaveValue(true);
-            optDescr.add(printOptionDescription);
+            if (optionName == null) {
+                System.out.println("Option name is null. Options will not be supported by CLI");
+                return;
+            } _optionName = sanitizeSingleSupportedOptionValue(optionName);
 
-            return optDescr;
+            _supportedValues = sanitizeAllSupportedOptionValues(supportedValues);
+            if (_supportedValues != null) {
+                _defaultSupportedValue = _supportedValues[0];
+                _messageSignalsTheUseOfDefaultValue = "The default value for option [" + _optionName + "] was set to [" + _defaultSupportedValue + "]";
+                for (var sv : _supportedValues) {
+                    _usageHelp += prefix + _optionName + "=" + sv + " OR ";
+                }
+                _usageHelp += prefix + _optionName; // sudoku --debug
+            } else {
+                _messageSignalsTheUseOfDefaultValue = "The option [" + _optionName + "] do not support value";
+                _usageHelp = appName + " " + prefix + _optionName; // sudoku --debug
+            }
+
+            OptionsDescription optionDescription = new OptionsDescription();
+            optionDescription.optionName = _optionName;
+            optionDescription.usageHelp = _usageHelp;
+            optionDescription.messageSignalsTheUseOfDefaultValue = _messageSignalsTheUseOfDefaultValue;
+            optionDescription.canHaveValue = canHaveValue;
+            optionDescription.supportedValues = _supportedValues;
+            optionDescription.supportOtherOptions = supportOtherOptions;
+            optDesc.add(optionDescription);
         }
 
-        @Setter
+        private static boolean isStringNullOrEmpty(String str) {
+            String strTrim = str.trim();
+            return strTrim == null || strTrim.equals("");
+        }
+
+        private static boolean isArrayNullOrEmpty(String[] strArray) {
+            return strArray == null || strArray.length == 0;
+        }
+
+        private static String[] sanitizeAllSupportedOptionValues(String[] supportedOptions) {
+            if (isArrayNullOrEmpty(supportedOptions)) return null;
+
+            String[] sanitizedSupportedOptions = new String[supportedOptions.length];
+            int paramCount = 1;
+            for (var s = 0; s < supportedOptions.length; s++) {
+                if (supportedOptions[s] == null || supportedOptions[s].equals(""))
+                    sanitizedSupportedOptions[s] = "value" + paramCount++;
+                else
+                    sanitizedSupportedOptions[s] = sanitizeSingleSupportedOptionValue(supportedOptions[s]);
+            }
+
+            return sanitizedSupportedOptions;
+        }
+
+        private static String sanitizeSingleSupportedOptionValue(String value) {
+            String regex = "[a-zA-Z0-9]+";
+
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(value);
+
+            StringBuilder sb = new StringBuilder();
+            while (matcher.find())
+                sb.append(matcher.group());
+
+            return sb.length() == 0 ? value : sb.toString();
+        }
+
         @Getter
+        @ToString
         private static class OptionsDescription {
-            private String parameterName, usageHelp;
-            boolean canHaveValue;
+            private String optionName, usageHelp, messageSignalsTheUseOfDefaultValue;
+            boolean canHaveValue; // used by options that expect user input value (ex: --print=MyFile.txt )
+            boolean supportOtherOptions; // ex --debug=enable
+            String[] supportedValues;
         }
     }
 }
