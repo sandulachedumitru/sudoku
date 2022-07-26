@@ -6,6 +6,7 @@ import lombok.ToString;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,55 +18,197 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class CommandLineParametersService {
 
+    private static final String APP_NAME = "sudoku";
+    private static final String CMD_OPTION_PREFIX = "--";
+
 
     public static void main(String... args) {
         System.out.println(CmdOptions.sanitizeSingleSupportedOptionValue("-=ena bl -e+"));
         System.out.println(CmdOptions.sanitizeSingleSupportedOptionValue("disable"));
 
-        CmdOptions.initCmdOptions();
-        System.out.println("optDesc size: " + CmdOptions.optDesc.size());
-        for (var od : CmdOptions.optDesc) {
+//        String[] arguments = {
+//                "abc",
+//                "-debug",
+//                "--debug",
+//                "-debug=",
+//                "--debug=",
+//                "-debug=enable",
+//                "--debug=enable",
+//                "---debug=enable",
+//                "--debug1=enable",
+//                "--debug=.enable",
+//                "MySudokyFile.txt",
+//                "--help",
+//                "--help=true"
+//        };
 
-            System.out.println("cmd options: " + od);
-        }
+//        String[] arguments = {
+//                "--debug",
+//                "--debug=enable",
+//                "--debug=enable",
+//                "MySudokyFile.txt",
+//                "--help",
+//                "--help=true"
+//        };
 
-//        cmdParameterProcessor(args);
+        String[] arguments = {
+                "--debug=enable",
+                "--debug",
+                "--debug=enable",
+                "MySudokyFile.txt",
+                "--help=true",
+                "--help"
+        };
 
+        cmdParameterProcessor(arguments);
     }
 
     public static void cmdParameterProcessor(String... args) {
-        areFormattedParameters(args);
+        CmdOptions.defineCmdOptions();
+        System.out.println("optDesc size: " + CmdOptions.optDesc.size());
+        for (var od : CmdOptions.optDesc)
+            System.out.println("cmd options: " + od);
+
+        var areFormatted = areAllParametersFormatted(args);
+        System.out.println("areAllParametersFormatted(args): " + areFormatted);
+        for (var argsInfo : CmdArgsParser.parsedArgumentsInfo)
+            System.out.println("parsedArgumentsInfo: " + argsInfo);
+
+
+
     }
 
-    public static boolean areFormattedParameters(String... args) {
+    public static boolean areAllParametersFormatted(String... args) {
+        String regexForCmdOptions = "^(--([a-zA-Z]+[^0-9\\W]))(=(\\w+))?$";
+        String regexForCmdParameters = "^(\\w+)(\\.([a-zA-Z0-9]+))?$";
+        //String regexForCmdParameters = "^([a-zA-Z0-9]+)(\\.([a-zA-Z0-9]+))?$";
 
-        String regexForCmdParameters = "^([a-zA-Z0-9]+)(\\.[a-zA-Z0-9]+)?$";
-        String regexForCmdOptions = "^(--[a-zA-Z]+[^0-9\\W])(=(\\w+))?$";
-
-        Pattern pattern = Pattern.compile(regexForCmdOptions);
+        Pattern patternCmdOption = Pattern.compile(regexForCmdOptions);
+        Pattern patternCmdParam = Pattern.compile(regexForCmdParameters);
 
         boolean result = true;
         for (String arg : args) {
-            System.out.print("arg: " + arg + "\t");
-            Matcher matcher = pattern.matcher(arg);
-            if (matcher.find()) {
-                System.out.print("Start index: " + matcher.start());
-                System.out.print(" End index: " + matcher.end() + "\t");
-                System.out.println("groupCount: " + matcher.groupCount());
-                System.out.println("\t\tgroup()--> " + matcher.group());
-                for (int g = 0; g <= matcher.groupCount(); g++) {
-                    System.out.println("\t\tgroup[" + g + "]--> " + matcher.group(g));
-                }
-                if (matcher.group(2) == null && matcher.group(3) == null) {
+            var info = new CmdArgsParser.CmdArgsInfo();
 
+            info.cmdArgument = arg;
+
+            System.out.print("arg: " + arg + "\t");
+            Matcher matcherCmdOption = patternCmdOption.matcher(arg);
+            Matcher matcherCmdParam = patternCmdParam.matcher(arg);
+
+            if (matcherCmdOption.find()) {
+                /*
+                    arg: --debug=enable	Start index: 0 End index: 14	groupCount: 4
+                        group()--> --debug=enable
+                        group[0]--> --debug=enable
+                        group[1]--> --debug
+                        group[2]--> debug
+                        group[3]--> =enable
+                        group[4]--> enable
+                 */
+                System.out.print("Start index: " + matcherCmdOption.start());
+                System.out.print(" End index: " + matcherCmdOption.end() + "\t");
+                System.out.println("groupCount: " + matcherCmdOption.groupCount());
+                System.out.println("\t\tOPTION: group()--> " + matcherCmdOption.group());
+                for (int g = 0; g <= matcherCmdOption.groupCount(); g++) {
+                    System.out.println("\t\tOPTION: group[" + g + "]--> " + matcherCmdOption.group(g));
                 }
+
+                CmdArgsParser.CmdArgumentProperties properties = new CmdArgsParser.CmdArgumentProperties();
+                properties.isOption = true;
+                properties.name = matcherCmdOption.group(2);
+                properties.value = matcherCmdOption.group(4);
+
+                info.hasValidPattern = true;
+                //info.isSupported = CmdOptions.optDesc.contains(properties.name);
+                info.isSupported = CmdOptions.optDesc.stream().anyMatch(od -> od.optionName.equals(properties.name));
+                info.properties = properties;
+            } else if (matcherCmdParam.find()) {
+                /*
+                    arg: MySudokyFile.txt	Start index: 0 End index: 16	groupCount: 3
+                        PARAMETER: group()--> MySudokyFile.txt
+                        PARAMETER: group[0]--> MySudokyFile.txt
+                        PARAMETER: group[1]--> MySudokyFile
+                        PARAMETER: group[2]--> .txt
+                        PARAMETER: group[3]--> txt
+                 */
+                System.out.print("Start index: " + matcherCmdParam.start());
+                System.out.print(" End index: " + matcherCmdParam.end() + "\t");
+                System.out.println("groupCount: " + matcherCmdParam.groupCount());
+                System.out.println("\t\tPARAMETER: group()--> " + matcherCmdParam.group());
+                for (int g = 0; g <= matcherCmdParam.groupCount(); g++) {
+                    System.out.println("\t\tPARAMETER: group[" + g + "]--> " + matcherCmdParam.group(g));
+                }
+
+                CmdArgsParser.CmdArgumentProperties properties = new CmdArgsParser.CmdArgumentProperties();
+                properties.isOption = false;
+                properties.name = matcherCmdParam.group();
+                properties.value = null;
+
+                info.hasValidPattern = true;
+                info.isSupported = false;
+                info.properties = properties;
             } else {
                 System.out.println("NO MATCH !");
+
+                info.hasValidPattern = false;
+                info.isSupported = false;
+                info.properties = null;
+
                 result = false;
             }
+            CmdArgsParser.parsedArgumentsInfo.add(info);
         }
 
         return result;
+    }
+
+    @Getter
+    private static class CmdArgsParser {
+        private static final HashSet<CmdArgsInfo> parsedArgumentsInfo = new HashSet<>();
+
+        @Getter
+        @ToString
+        private static class CmdArgsInfo {
+            private String cmdArgument;
+            private boolean hasValidPattern = false;
+            private boolean isSupported = false; // relevant only for cmd options
+            private CmdArgumentProperties properties;
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                CmdArgsInfo that = (CmdArgsInfo) o;
+                return Objects.equals(properties, that.properties);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(properties);
+            }
+        }
+
+        @Getter
+        @ToString
+        private static class CmdArgumentProperties {
+            private boolean isOption = false; // true if cmd option (ex: --help); false if parameter (ex; SudokuInput.txt)
+            private String name;
+            private String value;
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                CmdArgumentProperties that = (CmdArgumentProperties) o;
+                return isOption == that.isOption && Objects.equals(name, that.name);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(isOption, name);
+            }
+        }
     }
 
     @Getter
@@ -73,7 +216,7 @@ public class CommandLineParametersService {
 
         private static final HashSet<OptionsDescription> optDesc =new HashSet<>();
 
-        private static void initCmdOptions() {
+        private static void defineCmdOptions() {
             // --help
             storeOptionsProperties("help", null, false, false);
 
@@ -91,9 +234,6 @@ public class CommandLineParametersService {
                 boolean supportOtherOptions,
                 boolean canHaveValue
         ) {
-            String appName = "sudoku";
-            String prefix = "--";
-
             String _optionName, _usageHelp = "", _messageSignalsTheUseOfDefaultValue;
             String _defaultSupportedValue;
             String[] _supportedValues;
@@ -108,12 +248,12 @@ public class CommandLineParametersService {
                 _defaultSupportedValue = _supportedValues[0];
                 _messageSignalsTheUseOfDefaultValue = "The default value for option [" + _optionName + "] was set to [" + _defaultSupportedValue + "]";
                 for (var sv : _supportedValues) {
-                    _usageHelp += prefix + _optionName + "=" + sv + " OR ";
+                    _usageHelp += CMD_OPTION_PREFIX + _optionName + "=" + sv + " OR ";
                 }
-                _usageHelp += prefix + _optionName; // sudoku --debug
+                _usageHelp += CMD_OPTION_PREFIX + _optionName; // sudoku --debug
             } else {
                 _messageSignalsTheUseOfDefaultValue = "The option [" + _optionName + "] do not support value";
-                _usageHelp = appName + " " + prefix + _optionName; // sudoku --debug
+                _usageHelp = APP_NAME + " " + CMD_OPTION_PREFIX + _optionName; // sudoku --debug
             }
 
             OptionsDescription optionDescription = new OptionsDescription();

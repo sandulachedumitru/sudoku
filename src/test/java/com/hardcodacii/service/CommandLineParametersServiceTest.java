@@ -25,27 +25,27 @@ class CommandLineParametersServiceTest {
 
         System.out.println("Test parameters one by one");
         System.out.println("--------------------------");
-        Assertions.assertTrue(CommandLineParametersService.areFormattedParameters("--abc"));
-        Assertions.assertTrue(CommandLineParametersService.areFormattedParameters("--abc=123bc5de34"));
+        Assertions.assertTrue(CommandLineParametersService.areAllParametersFormatted("--abc"));
+        Assertions.assertTrue(CommandLineParametersService.areAllParametersFormatted("--abc=123bc5de34"));
 
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("-abc"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("-abc=123bc5de34"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("--abc012345"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("--abc="));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("---abc"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("xyz--abc"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters(" --abc"));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("--abc "));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters("-abc=123bc5de34"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("-abc"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("-abc=123bc5de34"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("--abc012345"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("--abc="));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("---abc"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("xyz--abc"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted(" --abc"));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("--abc "));
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted("-abc=123bc5de34"));
 
         System.out.println();
         System.out.println("Test multiple parameters at once");
         System.out.println("--------------------------------");
-        Assertions.assertTrue(CommandLineParametersService.areFormattedParameters(
+        Assertions.assertTrue(CommandLineParametersService.areAllParametersFormatted(
                 "--abc"
                 , "--abc=123bc5de34"
         ));
-        Assertions.assertFalse(CommandLineParametersService.areFormattedParameters(
+        Assertions.assertFalse(CommandLineParametersService.areAllParametersFormatted(
                 "-abc"
                 , "-abc=123bc5de34"
                 , "--abc012345"
