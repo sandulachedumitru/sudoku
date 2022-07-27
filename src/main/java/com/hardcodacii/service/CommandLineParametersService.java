@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +51,9 @@ public class CommandLineParametersService {
 //        };
 
         String[] arguments = {
-                "--debug=enable",
+                "-abc",
+                "--skipTest=true",
+                "--debug=true",
                 "--debug",
                 "--debug=enable",
                 "MySudokyFile.txt",
@@ -64,48 +65,54 @@ public class CommandLineParametersService {
     }
 
     public static void cmdParameterProcessor(String... args) {
+        // definitions and initialization of the supported cmd options
         CmdOptions.defineCmdOptions();
         System.out.println("optDesc size: " + CmdOptions.optDesc.size());
         for (var od : CmdOptions.optDesc)
             System.out.println("cmd options: " + od);
 
+        // analyzing the app arguments
         var areFormatted = areAllParametersFormatted(args);
         System.out.println("areAllParametersFormatted(args): " + areFormatted);
+        System.out.println("parsedArgumentsInfo: ");
         for (var argsInfo : CmdArgsParser.parsedArgumentsInfo)
-            System.out.println("parsedArgumentsInfo: " + argsInfo);
+            System.out.println("\t" + argsInfo);
+        System.out.println("Number of occurrences for:");
+        for (var entry : CmdArgsParser.numberOfOccurrences.entrySet())
+            System.out.println("\t[arg:" + entry.getKey() + "]\t[occurrences:" + entry.getValue() + "]");
 
-
+        // perform action
 
     }
 
     public static boolean areAllParametersFormatted(String... args) {
-        String regexForCmdOptions = "^(--([a-zA-Z]+[^0-9\\W]))(=(\\w+))?$";
-        String regexForCmdParameters = "^(\\w+)(\\.([a-zA-Z0-9]+))?$";
+        var regexForCmdOptions = "^(--([a-zA-Z]+[^0-9\\W]))(=(\\w+))?$";
+        var regexForCmdParameters = "^(\\w+)(\\.([a-zA-Z0-9]+))?$";
         //String regexForCmdParameters = "^([a-zA-Z0-9]+)(\\.([a-zA-Z0-9]+))?$";
 
-        Pattern patternCmdOption = Pattern.compile(regexForCmdOptions);
-        Pattern patternCmdParam = Pattern.compile(regexForCmdParameters);
+        var patternCmdOption = Pattern.compile(regexForCmdOptions);
+        var patternCmdParam = Pattern.compile(regexForCmdParameters);
 
         boolean result = true;
-        for (String arg : args) {
+        for (var arg : args) {
             var info = new CmdArgsParser.CmdArgsInfo();
 
             info.cmdArgument = arg;
 
             System.out.print("arg: " + arg + "\t");
-            Matcher matcherCmdOption = patternCmdOption.matcher(arg);
-            Matcher matcherCmdParam = patternCmdParam.matcher(arg);
+            var matcherCmdOption = patternCmdOption.matcher(arg);
+            var matcherCmdParam = patternCmdParam.matcher(arg);
 
             if (matcherCmdOption.find()) {
-                /*
-                    arg: --debug=enable	Start index: 0 End index: 14	groupCount: 4
-                        group()--> --debug=enable
-                        group[0]--> --debug=enable
-                        group[1]--> --debug
-                        group[2]--> debug
-                        group[3]--> =enable
-                        group[4]--> enable
-                 */
+                    /*
+                        arg: --debug=enable	Start index: 0 End index: 14	groupCount: 4
+                            group()--> --debug=enable
+                            group[0]--> --debug=enable
+                            group[1]--> --debug
+                            group[2]--> debug
+                            group[3]--> =enable
+                            group[4]--> enable
+                    */
                 System.out.print("Start index: " + matcherCmdOption.start());
                 System.out.print(" End index: " + matcherCmdOption.end() + "\t");
                 System.out.println("groupCount: " + matcherCmdOption.groupCount());
@@ -120,18 +127,17 @@ public class CommandLineParametersService {
                 properties.value = matcherCmdOption.group(4);
 
                 info.hasValidPattern = true;
-                //info.isSupported = CmdOptions.optDesc.contains(properties.name);
                 info.isSupported = CmdOptions.optDesc.stream().anyMatch(od -> od.optionName.equals(properties.name));
                 info.properties = properties;
             } else if (matcherCmdParam.find()) {
-                /*
-                    arg: MySudokyFile.txt	Start index: 0 End index: 16	groupCount: 3
-                        PARAMETER: group()--> MySudokyFile.txt
-                        PARAMETER: group[0]--> MySudokyFile.txt
-                        PARAMETER: group[1]--> MySudokyFile
-                        PARAMETER: group[2]--> .txt
-                        PARAMETER: group[3]--> txt
-                 */
+                    /*
+                        arg: MySudokyFile.txt	Start index: 0 End index: 16	groupCount: 3
+                            PARAMETER: group()--> MySudokyFile.txt
+                            PARAMETER: group[0]--> MySudokyFile.txt
+                            PARAMETER: group[1]--> MySudokyFile
+                            PARAMETER: group[2]--> .txt
+                            PARAMETER: group[3]--> txt
+                    */
                 System.out.print("Start index: " + matcherCmdParam.start());
                 System.out.print(" End index: " + matcherCmdParam.end() + "\t");
                 System.out.println("groupCount: " + matcherCmdParam.groupCount());
@@ -157,6 +163,17 @@ public class CommandLineParametersService {
 
                 result = false;
             }
+
+            if (info.properties != null)
+                if (CmdArgsParser.parsedArgumentsInfo.contains(info)) {
+                    System.out.println("already exists: " + info.properties.name + "\n");
+                    int numOfOcc = CmdArgsParser.numberOfOccurrences.get(info.properties.name);
+                    CmdArgsParser.numberOfOccurrences.put(
+                            info.properties.name,
+                            ++numOfOcc
+                    );
+                } else CmdArgsParser.numberOfOccurrences.put(info.properties.name, 1);
+
             CmdArgsParser.parsedArgumentsInfo.add(info);
         }
 
@@ -165,7 +182,8 @@ public class CommandLineParametersService {
 
     @Getter
     private static class CmdArgsParser {
-        private static final HashSet<CmdArgsInfo> parsedArgumentsInfo = new HashSet<>();
+        private static final ArrayList<CmdArgsInfo> parsedArgumentsInfo = new ArrayList<>();
+        private static final Map<String, Integer> numberOfOccurrences = new HashMap<>();
 
         @Getter
         @ToString
@@ -214,14 +232,14 @@ public class CommandLineParametersService {
     @Getter
     private static class CmdOptions {
 
-        private static final HashSet<OptionsDescription> optDesc =new HashSet<>();
+        private static final HashSet<OptionsDescription> optDesc = new HashSet<>();
 
         private static void defineCmdOptions() {
             // --help
             storeOptionsProperties("help", null, false, false);
 
             // --debug
-            String[] supportedValues = new String[] {"disable", "enable"};
+            String[] supportedValues = new String[]{"disable", "enable"};
             storeOptionsProperties("debug", supportedValues, true, false);
 
             // --printTo
@@ -241,7 +259,8 @@ public class CommandLineParametersService {
             if (optionName == null) {
                 System.out.println("Option name is null. Options will not be supported by CLI");
                 return;
-            } _optionName = sanitizeSingleSupportedOptionValue(optionName);
+            }
+            _optionName = sanitizeSingleSupportedOptionValue(optionName);
 
             _supportedValues = sanitizeAllSupportedOptionValues(supportedValues);
             if (_supportedValues != null) {
