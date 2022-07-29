@@ -8,34 +8,34 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LogChacheService {
-    private String CRLF = "\r\n";
-    private String ERROR = " -ERROR:";
+	private String CRLF = "\r\n";
+	private String ERROR = " -ERROR:";
 
-    private StringBuilder logCache = new StringBuilder();
+	private StringBuilder logCache = new StringBuilder();
 
-    public void showln(Object obj) {
-        logCache.append(obj.toString());
-        logCache.append(CRLF);
-    }
+	public void showln(Object obj) {
+		logCache.append(obj.toString());
+		logCache.append(CRLF);
+	}
 
-    public void show(Object obj) {
-        logCache.append(obj.toString());
-    }
+	public void show(Object obj) {
+		logCache.append(obj.toString());
+	}
 
-    public void showlnErr(Object obj) {
-        logCache.append(ERROR + obj.toString());
-        logCache.append(CRLF);
-    }
+	public void showlnErr(Object obj) {
+		logCache.append(ERROR + obj.toString());
+		logCache.append(CRLF);
+	}
 
-    public void showErr(Object obj) {
-        logCache.append(ERROR + obj.toString());
-    }
+	public void showErr(Object obj) {
+		logCache.append(ERROR + obj.toString());
+	}
 
-    public StringBuilder getLogCache() {
-        return logCache;
-    }
+	public StringBuilder getLogCache() {
+		return logCache;
+	}
 
-    public String getErrorSuffix() {
-        return ERROR;
-    }
+	public String getErrorSuffix() {
+		return ERROR;
+	}
 }

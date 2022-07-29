@@ -13,14 +13,14 @@ import java.util.Set;
 @Getter
 @Setter
 public class Square extends Element {
-    
-    private Set<Cell> setOfCell = new HashSet<>();
 
-    public Square() {
-        super(null, null);
-    }
+	private Set<Cell> setOfCell = new HashSet<>();
 
-    public Square(Integer row, Integer column) {
-        super(row, column);
-    }
+	public Square() {
+		super(null, null);
+	}
+
+	public Square(Integer row, Integer column) {
+		super(row, column);
+	}
 }

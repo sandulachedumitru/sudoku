@@ -14,18 +14,18 @@ import java.util.Objects;
 @Getter
 @Setter
 public class Element {
-    private Integer row, column;
+	private Integer row, column;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Element element = (Element) o;
-        return row.equals(element.row) && column.equals(element.column);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Element element = (Element) o;
+		return row.equals(element.row) && column.equals(element.column);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, column);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(row, column);
+	}
 }

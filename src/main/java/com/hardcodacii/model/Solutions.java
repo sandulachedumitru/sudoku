@@ -15,5 +15,5 @@ import java.util.Set;
 @Setter
 @Component
 public class Solutions {
-    private Set<Board> solutions = new HashSet<>();
+	private Set<Board> solutions = new HashSet<>();
 }
