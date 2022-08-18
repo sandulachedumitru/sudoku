@@ -33,11 +33,11 @@ public class CommandLineParametersService {
 				//"-abc",
 				//"--skipTest=true",
 				"--printTo=DefaultSudokuFile.txt",
-				"--debug=true",
+				"--debug=enable",
 				//"--debug",
 				//"--debug=enable",
 				"MySudokuFile.txt",
-				"--help=true",
+				"--help",
 				//"--help"
 		};
 
@@ -76,7 +76,6 @@ public class CommandLineParametersService {
 			}
 		}
 
-
 		if (areFormatted) {
 			System.out.println("The cmd arguments are formatted");
 			if (!areManyOccurrences) {
@@ -89,7 +88,18 @@ public class CommandLineParametersService {
 					}
 				} else System.out.println("\tAll arguments are supported");
 
-
+				System.out.println("Check if the values of options are valid");
+				boolean isValidValue = true;
+				for (var info : CmdArgsParser.parsedOptionsInfo) {
+					System.out.print("\toption:[" + info.properties.name + "] -> value:[" + info.properties.value + "] -> ");
+					if (info.properties.isOption)
+//						if (! CmdOptionsDefinition.optDesc.contains(info.properties.value)) { // TODO wrong condition
+						if (validateValue(CmdOptionsDefinition.optDesc, info.properties.value)) { // TODO wrong condition
+							System.out.println("INVALID VALUE");
+							isValidValue = false;
+						} else System.out.println("VALID VALUE");
+					else System.out.println("NOT AN OPTION !!!");
+				}
 			} else {
 				System.out.println("Many occurrences for same arguments. Display --help usage. Exiting app ...");
 				for (var entry : CmdArgsParser.numberOfOccurrences.entrySet()) {
@@ -105,6 +115,11 @@ public class CommandLineParametersService {
 					System.out.println("\tInvalid argument: [" + puai.cmdArgument + "]");
 			// TODO display --help usage
 		}
+	}
+
+	private static boolean validateValue(HashSet<CmdOptionsDefinition.OptionsDescription> optDesc, String value) {
+		// TODO
+		return false;
 	}
 
 	private static class CmdArgsParser {
@@ -228,7 +243,7 @@ public class CommandLineParametersService {
 		@Getter
 		@ToString
 		private static class CmdArgsInfo {
-			private String cmdArgument;
+			private String cmdArgument; // ex: cmdArgument=--printTo=DefaultSudokuFile.txt
 			private boolean hasValidPattern = false;
 			private boolean isSupported = false; // relevant only for cmd options
 			private CmdArgumentProperties properties;
@@ -250,9 +265,9 @@ public class CommandLineParametersService {
 		@Getter
 		@ToString
 		private static class CmdArgumentProperties {
-			private boolean isOption = false; // true if cmd option (ex: --help); false if parameter (ex; SudokuInput.txt)
-			private String name;
-			private String value;
+			private boolean isOption = false; // true if cmd option (ex: --printTo); false if parameter (ex; SudokuInput.txt)
+			private String name; // ex: name=printTo
+			private String value; // ex: value=DefaultSudokuFile.txt
 
 			@Override
 			public boolean equals(Object o) {
