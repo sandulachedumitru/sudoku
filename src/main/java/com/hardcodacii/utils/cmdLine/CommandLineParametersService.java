@@ -32,13 +32,13 @@ public class CommandLineParametersService {
 		String[] arguments = {
 				//"-abc",
 				//"--skipTest=true",
-				"--printTo=DefaultSudokuFile.txt",
+				"--printTo=SudokuFile.txt",
 				"--debug=enable",
 				//"--debug",
 				//"--debug=enable",
 				"MySudokuFile.txt",
-				"--help",
-				//"--help"
+				//"--help=true",
+				"--help"
 		};
 
 		cmdParameterProcessor(arguments);
@@ -93,13 +93,30 @@ public class CommandLineParametersService {
 				for (var info : CmdArgsParser.parsedOptionsInfo) {
 					System.out.print("\toption:[" + info.properties.name + "] -> value:[" + info.properties.value + "] -> ");
 					if (info.properties.isOption)
-//						if (! CmdOptionsDefinition.optDesc.contains(info.properties.value)) { // TODO wrong condition
-						if (validateValue(CmdOptionsDefinition.optDesc, info.properties.value)) { // TODO wrong condition
+						if (isOptionValueDefined(info.properties)) {
+							System.out.println("VALID VALUE");
+						} else {
 							System.out.println("INVALID VALUE");
 							isValidValue = false;
-						} else System.out.println("VALID VALUE");
+						}
 					else System.out.println("NOT AN OPTION !!!");
 				}
+
+				if (! isValidValue) return;;
+
+				System.out.println("The command - option - parameter:");
+				System.out.print("\tsudoku ");
+				for (var info : CmdArgsParser.parsedOptionsInfo) {
+					System.out.print(CMD_OPTION_PREFIX + info.properties.name);
+					if (info.properties.value != null)
+						System.out.print("=" + info.properties.value);
+					System.out.print(" ");
+				}
+				for (var info : CmdArgsParser.parsedParametersInfo)
+					System.out.print(info.properties.name);
+
+
+				System.out.println();
 			} else {
 				System.out.println("Many occurrences for same arguments. Display --help usage. Exiting app ...");
 				for (var entry : CmdArgsParser.numberOfOccurrences.entrySet()) {
@@ -117,8 +134,21 @@ public class CommandLineParametersService {
 		}
 	}
 
-	private static boolean validateValue(HashSet<CmdOptionsDefinition.OptionsDescription> optDesc, String value) {
-		// TODO
+	private static boolean isOptionValueDefined(CmdArgsParser.CmdArgumentProperties properties) {
+		for (var description : CmdOptionsDefinition.optDesc) {
+			if (description.optionName.equalsIgnoreCase(properties.name)) {
+				if (description.supportedValues == null)
+					if (description.acceptsUserInputValue) return true;
+					else if (properties.value != null) return false;
+					else return true;
+				else {
+					assert description.supportedValues != null;
+					for (var value : description.supportedValues)
+						if (value.equalsIgnoreCase(properties.value)) return true;
+					return false;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -167,10 +197,22 @@ public class CommandLineParametersService {
 						System.out.println("\t\tOPTION: group[" + g + "]--> " + matcherCmdOption.group(g));
 					}
 
+					String optName = matcherCmdOption.group(2);
+					String optValue = matcherCmdOption.group(4);
+
+					// if no value for option then default value will be used
+					if (optValue == null) {
+						for (var optDesc : CmdOptionsDefinition.optDesc)
+							if (optDesc.optionName.equalsIgnoreCase(optName)) {
+								optValue = optDesc.defaultSupportedValue;
+								break;
+							}
+					}
+
 					CmdArgumentProperties properties = new CmdArgumentProperties();
 					properties.isOption = true;
-					properties.name = matcherCmdOption.group(2);
-					properties.value = matcherCmdOption.group(4);
+					properties.name = optName;
+					properties.value = optValue;
 
 					info.hasValidPattern = true;
 					info.isSupported = CmdOptionsDefinition.optDesc.stream().anyMatch(od -> od.optionName.equals(properties.name));
@@ -220,7 +262,6 @@ public class CommandLineParametersService {
 			}
 
 			// number of occurrences
-
 			// options
 			for (var info : parsedOptionsInfo) {
 				if (numberOfOccurrences.containsKey(info)) {
@@ -290,14 +331,15 @@ public class CommandLineParametersService {
 
 		public static void defineCmdOptions() {
 			// --help
-			storeOptionsProperties("help", null, false, false, Help.getInstance());
+			storeOptionsProperties("help", null, false, false, null, Help.getInstance());
 
 			// --debug
 			String[] supportedDebugValues = new String[]{"disable", "enable"};
-			storeOptionsProperties("debug", supportedDebugValues, true, false, Debug.getInstance());
+			storeOptionsProperties("debug", supportedDebugValues, true, false, null, Debug.getInstance());
 
 			// --printTo
-			storeOptionsProperties("printTo", null, true, true, PrintTo.getInstance());
+			String userInputValue = "DefaultSudokuFile.txt";
+			storeOptionsProperties("printTo", null, true, true, userInputValue, PrintTo.getInstance());
 		}
 
 		private static void storeOptionsProperties(
@@ -305,10 +347,11 @@ public class CommandLineParametersService {
 				String[] supportedValues,
 				boolean supportOtherOptions,
 				boolean acceptsUserInputValue,
+				String userInputValue,
 				CmdOptionPerformAction performer
 		) {
 			String _optionName, _usageHelp = APP_NAME + " ", _messageSignalsTheUseOfDefaultValue;
-			String _defaultSupportedValue = "";
+			String _defaultSupportedValue = userInputValue;
 			String[] _supportedValues;
 
 			if (optionName == null) {
@@ -340,6 +383,7 @@ public class CommandLineParametersService {
 			optionDescription.messageSignalsTheUseOfDefaultValue = _messageSignalsTheUseOfDefaultValue;
 			optionDescription.acceptsUserInputValue = acceptsUserInputValue;
 			optionDescription.supportedValues = _supportedValues;
+			optionDescription.defaultSupportedValue = _defaultSupportedValue;
 			optionDescription.supportOtherOptions = supportOtherOptions;
 			optionDescription.performer = performer;
 			optDesc.add(optionDescription);
@@ -387,6 +431,7 @@ public class CommandLineParametersService {
 			boolean acceptsUserInputValue; // used by options that expect user input value (ex: --print=MyFile.txt )
 			boolean supportOtherOptions; // ex --help don't support other options
 			String[] supportedValues; // ex --debug=enable
+			String defaultSupportedValue; // ex: --debug=disable
 			CmdOptionPerformAction performer;
 			private String optionName, usageHelp, messageSignalsTheUseOfDefaultValue;
 		}
