@@ -2,9 +2,10 @@ package com.hardcodacii.utils.cmdLine;
 
 import com.hardcodacii.global.SystemEnvironmentVariable;
 import com.hardcodacii.utils.cmdLine.performActions.CmdOptionPerformAction;
-import com.hardcodacii.utils.cmdLine.performActions.Debug;
-import com.hardcodacii.utils.cmdLine.performActions.Help;
-import com.hardcodacii.utils.cmdLine.performActions.PrintTo;
+import com.hardcodacii.utils.cmdLine.performActions.option.Debug;
+import com.hardcodacii.utils.cmdLine.performActions.option.Help;
+import com.hardcodacii.utils.cmdLine.performActions.option.PrintTo;
+import com.hardcodacii.utils.cmdLine.performActions.parameter.Parameter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -32,8 +33,8 @@ public class CommandLineParametersService {
 		String[] arguments = {
 				//"-abc",
 				//"--skipTest=true",
-				"--printTo=SudokuFile.txt",
-				"--debug=enable",
+				"--printTo",
+				"--debug",
 				//"--debug",
 				//"--debug=enable",
 				"MySudokuFile.txt",
@@ -114,9 +115,22 @@ public class CommandLineParametersService {
 				}
 				for (var info : CmdArgsParser.parsedParametersInfo)
 					System.out.print(info.properties.name);
-
-
 				System.out.println();
+
+				System.out.println("PERFORM ACTIONS FOR OPTIONS AND PARAMETER");
+				for (var info : CmdArgsParser.parsedOptionsInfo) {
+					for (var optDesc : CmdOptionsDefinition.optDesc) {
+						if (info.properties.name.equalsIgnoreCase(optDesc.optionName)) {
+							optDesc.getPerformer().performAction(info.properties.value);
+							break;
+						}
+					}
+				}
+				for (var info : CmdArgsParser.parsedParametersInfo) {
+					CmdOptionPerformAction parameter = Parameter.getInstance();
+					parameter.performAction(info.properties.name);
+				}
+
 			} else {
 				System.out.println("Many occurrences for same arguments. Display --help usage. Exiting app ...");
 				for (var entry : CmdArgsParser.numberOfOccurrences.entrySet()) {

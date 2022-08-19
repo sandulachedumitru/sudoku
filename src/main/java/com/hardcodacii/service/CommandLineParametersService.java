@@ -415,7 +415,6 @@ class OptionsProcessor {
 		helpCons.accept("THis is the usage for --help with Consumer");
 
 		CmdOption2 help2 = System.out::println;
-		;
 		help2.execute("THis is the usage for --help with CmdOption2");
 
 		Function<String, String> helpFunc = str -> str + " with Function";

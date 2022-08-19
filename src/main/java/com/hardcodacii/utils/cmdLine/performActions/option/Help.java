@@ -1,4 +1,6 @@
-package com.hardcodacii.utils.cmdLine.performActions;
+package com.hardcodacii.utils.cmdLine.performActions.option;
+
+import com.hardcodacii.utils.cmdLine.performActions.CmdOptionPerformAction;
 
 /**
  * @author Dumitru Săndulache (sandulachedumitru@hotmail.com)
@@ -16,6 +18,6 @@ public class Help implements CmdOptionPerformAction {
 
 	@Override
 	public void performAction(String str) {
-
+		System.out.println("THis is the usage for --help=" + str);
 	}
 }
